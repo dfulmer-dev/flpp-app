@@ -64,40 +64,31 @@
             <p>Smart nutrition tracking with instant search</p>
             <div class="date-display" id="dateDisplay"></div>
         </div>
-
         <div class="metrics">
             <div class="metric-card">
                 <div class="metric-label">Calories</div>
                 <div class="metric-value" id="calorieValue">0</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="calorieProgress" style="width: 0%"></div>
-                </div>
+                <div class="progress-bar"><div class="progress-fill" id="calorieProgress" style="width: 0%"></div></div>
                 <div class="metric-label" style="margin-top: 4px; font-size: 11px; color: #999;" id="calorieTarget">Target: 2,500</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Protein</div>
                 <div class="metric-value" id="proteinValue">0g</div>
-                <div class="progress-bar">
-                    <div class="progress-fill" id="proteinProgress" style="width: 0%"></div>
-                </div>
+                <div class="progress-bar"><div class="progress-fill" id="proteinProgress" style="width: 0%"></div></div>
                 <div class="metric-label" style="margin-top: 4px; font-size: 11px; color: #999;" id="proteinTarget">Target: 170g</div>
             </div>
         </div>
-
         <div class="search-section">
-            <input type="text" class="search-input" id="foodSearch" placeholder="🔍 Search foods (e.g., 'chicken', 'stouffers', 'egg')">
+            <input type="text" class="search-input" id="foodSearch" placeholder="🔍 Search foods (e.g., 'chicken', 'osso buco', 'pineapple')">
             <div class="search-results" id="searchResults" style="display: none;"></div>
         </div>
-
         <div class="quick-buttons" id="quickButtons"></div>
-
         <div class="meals-section">
             <div class="section-title">Today's Meals</div>
             <div id="mealsList" style="margin-bottom: 20px;"></div>
             <button class="quick-btn" style="width: 100%; grid-column: 1/-1;" onclick="openCustomMealModal()">+ Add Custom Meal</button>
         </div>
     </div>
-
     <div class="modal" id="customMealModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('customMealModal')">✕</button>
@@ -111,7 +102,6 @@
             <div class="form-group"><button onclick="saveCustomMeal()">Log Meal</button><div class="error-message" id="customMealError"></div></div>
         </div>
     </div>
-
     <div class="modal" id="servingSizeModal">
         <div class="modal-content">
             <button class="modal-close" onclick="closeModal('servingSizeModal')">✕</button>
@@ -120,36 +110,57 @@
             <div class="form-group" style="margin-top: 20px;"><button onclick="confirmServingSize()">Confirm</button></div>
         </div>
     </div>
-
     <script>
         const FOOD_DATABASE = [
             { name: "Bonos BBQ - Pulled Pork Sandwich", calories: 340, protein: 30, carbs: 37, fat: 9, category: "restaurant" },
             { name: "Bonos BBQ - BBQ Salad with Pork", calories: 530, protein: 53, carbs: 17, fat: 28, category: "restaurant" },
             { name: "Bonos BBQ - Pork Hawg", calories: 520, protein: 45, carbs: 55, fat: 14, category: "restaurant" },
+            { name: "Bonos BBQ - Smokehouse Pulled Chicken Sandwich", calories: 400, protein: 15, carbs: 73, fat: 3, category: "restaurant" },
             { name: "LongHorn - Filet 6oz", calories: 330, protein: 37, carbs: 2, fat: 18, category: "restaurant" },
-            { name: "LongHorn - Filet 9oz with Sides", calories: 650, protein: 52, carbs: 12, fat: 28, category: "restaurant" },
+            { name: "LongHorn - Filet 9oz (base)", calories: 450, protein: 52, carbs: 3, fat: 25, category: "restaurant" },
+            { name: "LongHorn - Filet 6oz with Sides", calories: 680, protein: 45, carbs: 35, fat: 28, category: "restaurant" },
             { name: "LongHorn - Grilled Chicken", calories: 280, protein: 35, carbs: 5, fat: 12, category: "restaurant" },
             { name: "Panera - Turkey Sandwich", calories: 900, protein: 43, carbs: 95, fat: 32, category: "restaurant" },
+            { name: "Panera - Chicken Sandwich", calories: 950, protein: 45, carbs: 100, fat: 35, category: "restaurant" },
             { name: "Panera - Salad with Chicken", calories: 520, protein: 40, carbs: 35, fat: 20, category: "restaurant" },
             { name: "Panera - Broccoli Cheddar Soup", calories: 260, protein: 12, carbs: 18, fat: 14, category: "restaurant" },
             { name: "Chick-fil-A - Chicken Sandwich Combo", calories: 460, protein: 28, carbs: 41, fat: 19, category: "restaurant" },
+            { name: "Chick-fil-A - Spicy Chicken Combo", calories: 460, protein: 28, carbs: 41, fat: 19, category: "restaurant" },
             { name: "Chick-fil-A - Market Salad", calories: 380, protein: 35, carbs: 15, fat: 18, category: "restaurant" },
             { name: "Chick-fil-A - Grilled Chicken Club", calories: 390, protein: 38, carbs: 25, fat: 16, category: "restaurant" },
             { name: "Olive Garden - Grilled Chicken + Toast", calories: 350, protein: 25, carbs: 20, fat: 14, category: "restaurant" },
             { name: "Olive Garden - Chicken Giardino", calories: 530, protein: 28, carbs: 35, fat: 22, category: "restaurant" },
+            { name: "Olive Garden - Chicken Margherita", calories: 580, protein: 32, carbs: 38, fat: 24, category: "restaurant" },
+            { name: "Olive Garden - Fettuccine Alfredo (Chicken)", calories: 1480, protein: 42, carbs: 98, fat: 95, category: "restaurant" },
             { name: "Darumas - Hibachi Chicken", calories: 750, protein: 45, carbs: 65, fat: 22, category: "restaurant" },
             { name: "Darumas - Hibachi Beef", calories: 800, protein: 48, carbs: 68, fat: 26, category: "restaurant" },
+            { name: "Darumas - Hibachi Steak with Rice & Veggies", calories: 800, protein: 40, carbs: 70, fat: 30, category: "restaurant" },
             { name: "Salsas - Carne Asada Tacos (2)", calories: 400, protein: 28, carbs: 35, fat: 18, category: "restaurant" },
+            { name: "Salsas - Carne Asada Tacos (per taco)", calories: 200, protein: 13, carbs: 18, fat: 10, category: "restaurant" },
+            { name: "Salsas - Carne Asada Fajita Plate", calories: 350, protein: 38, carbs: 20, fat: 14, category: "restaurant" },
             { name: "Salsas - Carne Asada Fajitas", calories: 520, protein: 38, carbs: 45, fat: 20, category: "restaurant" },
             { name: "Rice Bowl - Pho Beef", calories: 450, protein: 32, carbs: 38, fat: 12, category: "restaurant" },
             { name: "Rice Bowl - Pho Chicken", calories: 380, protein: 28, carbs: 35, fat: 10, category: "restaurant" },
+            { name: "Rice Bowl - Shrimp Pho", calories: 350, protein: 25, carbs: 37, fat: 6, category: "restaurant" },
             { name: "Arby's - Classic Roast Beef", calories: 360, protein: 23, carbs: 37, fat: 14, category: "restaurant" },
             { name: "Arby's - Beef N Cheddar", calories: 450, protein: 23, carbs: 45, fat: 20, category: "restaurant" },
-            { name: "Miller's - Osso Buco", calories: 1380, protein: 100, carbs: 120, fat: 65, category: "restaurant" },
+            { name: "Miller's Ale House - Osso Buco with Full Sides", calories: 1380, protein: 100, carbs: 120, fat: 65, category: "restaurant" },
+            { name: "Miller's Ale House - Osso Buco (base)", calories: 970, protein: 40, carbs: 80, fat: 48, category: "restaurant" },
             { name: "Bagels R Us - Egg & Cheese Bagel", calories: 475, protein: 23, carbs: 48, fat: 18, category: "restaurant" },
             { name: "Tropical Smoothie - Quesadilla", calories: 540, protein: 31, carbs: 39, fat: 27, category: "restaurant" },
+            { name: "Tropical Smoothie - Chicken Wrap", calories: 480, protein: 28, carbs: 42, fat: 22, category: "restaurant" },
             { name: "McDonald's - Double Cheeseburger", calories: 440, protein: 25, carbs: 35, fat: 20, category: "restaurant" },
-            { name: "Tijuana Flats - Burrito", calories: 680, protein: 32, carbs: 85, fat: 28, category: "restaurant" },
+            { name: "McDonald's - Big Mac", calories: 580, protein: 25, carbs: 46, fat: 30, category: "restaurant" },
+            { name: "McDonald's - Double Big Mac", calories: 767, protein: 43, carbs: 45, fat: 46, category: "restaurant" },
+            { name: "McDonald's - McDouble", calories: 390, protein: 22, carbs: 32, fat: 20, category: "restaurant" },
+            { name: "Tijuana Flats - Ground Beef Burrito", calories: 1360, protein: 53, carbs: 95, fat: 62, category: "restaurant" },
+            { name: "Tijuana Flats - Refried Beans Burrito", calories: 1210, protein: 33, carbs: 150, fat: 52, category: "restaurant" },
+            { name: "Tijuana Flats - Blackened Chicken Burrito", calories: 850, protein: 45, carbs: 85, fat: 25, category: "restaurant" },
+            { name: "Al's Pizza - Pepperoni Pizza (per slice)", calories: 325, protein: 12, carbs: 30, fat: 12, category: "restaurant" },
+            { name: "Al's Pizza - Pepperoni (2 slices)", calories: 650, protein: 24, carbs: 60, fat: 24, category: "restaurant" },
+            { name: "Papa Johns - Large Specialty Pepperoni (per slice)", calories: 320, protein: 12, carbs: 36, fat: 13, category: "restaurant" },
+            { name: "Papa Johns - Cheese Pizza (per slice)", calories: 190, protein: 5, carbs: 30, fat: 6, category: "restaurant" },
+            { name: "Hot Wok - Sesame Chicken with Fried Rice", calories: 399, protein: 8, carbs: 42, fat: 15, category: "restaurant" },
             { name: "Grilled Chicken Breast (3.5 oz)", calories: 165, protein: 31, carbs: 0, fat: 3.6, category: "protein" },
             { name: "Grilled Chicken Breast (6 oz)", calories: 280, protein: 53, carbs: 0, fat: 6, category: "protein" },
             { name: "Ground Beef 93/7 (3.5 oz)", calories: 170, protein: 23, carbs: 0, fat: 8, category: "protein" },
@@ -202,7 +213,51 @@
             { name: "Protein Shake (25g powder)", calories: 120, protein: 25, carbs: 2, fat: 2, category: "snack" },
             { name: "Protein Bar (typical)", calories: 250, protein: 20, carbs: 25, fat: 10, category: "snack" },
             { name: "Olive Oil (1 tbsp)", calories: 120, protein: 0, carbs: 0, fat: 14, category: "oil" },
-            { name: "Coconut Oil (1 tbsp)", calories: 120, protein: 0, carbs: 0, fat: 14, category: "oil" }
+            { name: "Coconut Oil (1 tbsp)", calories: 120, protein: 0, carbs: 0, fat: 14, category: "oil" },
+            { name: "Oreo Cookies (3 cookies)", calories: 160, protein: 2, carbs: 21, fat: 8, category: "snack" },
+            { name: "Oreo Cookies (1 serving pack)", calories: 140, protein: 1.5, carbs: 18, fat: 7, category: "snack" },
+            { name: "Chocolate Chip Cookies - Homestyle (2)", calories: 160, protein: 2, carbs: 20, fat: 8, category: "snack" },
+            { name: "Pistachio Nuts (1 oz / 49 nuts)", calories: 160, protein: 6, carbs: 8, fat: 13, category: "snack" },
+            { name: "Peanuts - Roasted & Salted (1 oz)", calories: 161, protein: 7, carbs: 6, fat: 14, category: "snack" },
+            { name: "Peanuts - Dry Roasted (1 oz)", calories: 160, protein: 7, carbs: 5, fat: 14, category: "snack" },
+            { name: "Mixed Nuts (1 oz)", calories: 168, protein: 5, carbs: 7, fat: 15, category: "snack" },
+            { name: "Cashews (1 oz)", calories: 155, protein: 5, carbs: 9, fat: 12, category: "snack" },
+            { name: "Walnuts (1 oz / 14 halves)", calories: 185, protein: 4, carbs: 4, fat: 19, category: "snack" },
+            { name: "Pecans (1 oz / 19 halves)", calories: 196, protein: 3, carbs: 4, fat: 20, category: "snack" },
+            { name: "Sunflower Seeds (1 oz)", calories: 165, protein: 6, carbs: 7, fat: 14, category: "snack" },
+            { name: "Pumpkin Seeds (1 oz)", calories: 151, protein: 5, carbs: 5, fat: 13, category: "snack" },
+            { name: "Granola Bar (typical)", calories: 130, protein: 3, carbs: 20, fat: 4, category: "snack" },
+            { name: "Fiber One Bar", calories: 90, protein: 2, carbs: 17, fat: 2.5, category: "snack" },
+            { name: "Beef Jerky (1 oz)", calories: 116, protein: 11, carbs: 3, fat: 7, category: "snack" },
+            { name: "Trail Mix (1 oz)", calories: 150, protein: 4, carbs: 13, fat: 9, category: "snack" },
+            { name: "Raisins (1/4 cup)", calories: 110, protein: 1, carbs: 29, fat: 0.2, category: "snack" },
+            { name: "Dried Cranberries (1/4 cup)", calories: 102, protein: 0.3, carbs: 27, fat: 0.3, category: "snack" },
+            { name: "Almonds - Chocolate Covered (1 oz)", calories: 170, protein: 5, carbs: 12, fat: 12, category: "snack" },
+            { name: "Crackers - Whole Grain (6 crackers)", calories: 120, protein: 3, carbs: 20, fat: 3, category: "snack" },
+            { name: "Crackers - Cheese (8 crackers)", calories: 140, protein: 3, carbs: 17, fat: 6, category: "snack" },
+            { name: "Hummus & Veggies (2 tbsp hummus)", calories: 100, protein: 3, carbs: 9, fat: 5, category: "snack" },
+            { name: "Almond Butter (2 tbsp)", calories: 190, protein: 7, carbs: 6, fat: 18, category: "snack" },
+            { name: "Cashew Butter (2 tbsp)", calories: 187, protein: 5, carbs: 8, fat: 16, category: "snack" },
+            { name: "Sunflower Seed Butter (2 tbsp)", calories: 186, protein: 7, carbs: 8, fat: 16, category: "snack" },
+            { name: "String Cheese (1 stick)", calories: 80, protein: 7, carbs: 1, fat: 6, category: "dairy" },
+            { name: "Beef Stick (1 stick)", calories: 80, protein: 7, carbs: 0, fat: 6, category: "snack" },
+            { name: "Pretzels (1 oz)", calories: 108, protein: 3, carbs: 23, fat: 1, category: "snack" },
+            { name: "Popcorn - Air Popped (3 cups)", calories: 93, protein: 3, carbs: 19, fat: 1, category: "snack" },
+            { name: "Dark Chocolate - 70% Cacao (1 oz)", calories: 170, protein: 3, carbs: 13, fat: 12, category: "snack" },
+            { name: "Goji Berries (2 tbsp)", calories: 80, protein: 3, carbs: 15, fat: 0.5, category: "snack" },
+            { name: "Publix - Precut Pineapple Spears (1 cup)", calories: 82, protein: 1, carbs: 22, fat: 0.3, category: "fruit" },
+            { name: "Publix - Precut Mango Chunks (1 cup)", calories: 99, protein: 1.4, carbs: 25, fat: 0.6, category: "fruit" },
+            { name: "Publix - Precut Watermelon (1 cup cubes)", calories: 46, protein: 0.9, carbs: 12, fat: 0.2, category: "fruit" },
+            { name: "Publix - Mixed Berry Container (1 cup)", calories: 85, protein: 1.5, carbs: 21, fat: 0.5, category: "fruit" },
+            { name: "Publix - Melon Medley (1 cup)", calories: 65, protein: 1, carbs: 16, fat: 0.4, category: "fruit" },
+            { name: "Publix - Precut Cantaloupe (1 cup)", calories: 54, protein: 1.3, carbs: 13, fat: 0.4, category: "fruit" },
+            { name: "Publix - Precut Honeydew (1 cup)", calories: 64, protein: 1, carbs: 16, fat: 0.3, category: "fruit" },
+            { name: "Publix - Precut Grapes (1 cup)", calories: 104, protein: 1, carbs: 27, fat: 0.2, category: "fruit" },
+            { name: "Publix - Precut Strawberries (1 container)", calories: 49, protein: 1, carbs: 12, fat: 0.5, category: "fruit" },
+            { name: "Publix - Precut Blueberries (1 container)", calories: 85, protein: 1, carbs: 21, fat: 0.5, category: "fruit" },
+            { name: "Publix - Precut Raspberries (1 container)", calories: 64, protein: 1.5, carbs: 15, fat: 0.8, category: "fruit" },
+            { name: "Publix - Precut Pineapple & Mango Mix (1 cup)", calories: 90, protein: 1.2, carbs: 23, fat: 0.5, category: "fruit" },
+            { name: "Publix - Precut Fruit Medley (1 cup)", calories: 80, protein: 1, carbs: 21, fat: 0.3, category: "fruit" }
         ];
 
         let appState = {
@@ -218,19 +273,26 @@
         function init() {
             updateDateDisplay();
             setupFuzzySearch();
+            checkAndResetForNewDay();
             loadDailyData();
             renderMeals();
             renderQuickButtons();
             setupSearch();
         }
 
+        function checkAndResetForNewDay() {
+            const storedDate = localStorage.getItem('flpp_last_date');
+            const today = appState.currentDate;
+            
+            if (storedDate && storedDate !== today) {
+                localStorage.removeItem(`flpp_meals_${storedDate}`);
+            }
+            
+            localStorage.setItem('flpp_last_date', today);
+        }
+
         function setupFuzzySearch() {
-            const options = {
-                keys: ['name'],
-                threshold: 0.4,
-                ignoreLocation: true,
-                minMatchCharLength: 2
-            };
+            const options = { keys: ['name'], threshold: 0.4, ignoreLocation: true, minMatchCharLength: 2 };
             appState.fuseSearch = new Fuse(FOOD_DATABASE, options);
         }
 
