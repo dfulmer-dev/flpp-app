@@ -1,484 +1,1045 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#667eea">
-    <meta name="description" content="FLPP Daily Log - Fulmer Longevity & Performance Project">
-    <title>FLPP Daily Log</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FLPP Phase 2 - Smart Nutrition Tracker</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
 
-        .app {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background: #f5f7fa;
-        }
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: #f5f7fa;
+    }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 24px 20px;
-            text-align: center;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
+    /* HEADER */
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px 16px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
 
-        .header h1 {
-            font-size: 28px;
-            margin-bottom: 4px;
-            font-weight: 700;
-        }
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
 
-        .header .subtitle {
-            font-size: 13px;
-            opacity: 0.9;
-        }
+    .header .subtitle {
+      font-size: 12px;
+      opacity: 0.9;
+    }
 
-        .container {
-            flex: 1;
-            padding: 20px;
-            max-width: 600px;
-            margin: 0 auto;
-            width: 100%;
-        }
+    /* MAIN CONTAINER - Mobile First */
+    .container {
+      flex: 1;
+      padding: 16px;
+      max-width: 100%;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-bottom: 100px;
+    }
 
-        .summary-section {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+    /* PROGRESS CARDS - Mobile Stack */
+    .progress-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
 
-        .summary-section h2 {
-            font-size: 18px;
-            margin-bottom: 16px;
-            color: #333;
-        }
+    .metric-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
 
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-        }
+    .metric-label {
+      font-size: 11px;
+      opacity: 0.9;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
+    }
 
-        .metric-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px;
-            border-radius: 8px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
+    .metric-value {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
 
-        .metric-label {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+    .metric-target {
+      font-size: 10px;
+      opacity: 0.8;
+    }
 
-        .metric-value {
-            font-size: 24px;
-            font-weight: 700;
-        }
+    .progress-bar {
+      width: 100%;
+      height: 4px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
 
-        .log-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
+    .progress-fill {
+      height: 100%;
+      background: #fff;
+      border-radius: 2px;
+      transition: width 0.3s ease;
+    }
 
-        .form-section {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
+    /* MEALS LIST */
+    .meals-section {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
 
-        .form-section h3 {
-            font-size: 16px;
-            margin-bottom: 16px;
-            color: #333;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 8px;
-        }
+    .meals-section h2 {
+      font-size: 16px;
+      margin-bottom: 12px;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 8px;
+    }
 
-        .meal-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #eee;
-        }
+    .meal-item {
+      padding: 12px;
+      margin-bottom: 10px;
+      background: #f9fafb;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+    }
 
-        .meal-group:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
+    .meal-item.empty {
+      color: #999;
+      font-style: italic;
+      border-left-color: #ccc;
+    }
 
-        .meal-group label {
-            font-weight: 600;
-            color: #555;
-            font-size: 14px;
-        }
+    .meal-info {
+      flex: 1;
+    }
 
-        .meal-info {
-            background: #f0f4ff;
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #667eea;
-            margin: 4px 0;
-        }
+    .meal-time {
+      font-size: 12px;
+      color: #667eea;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
 
-        input[type="text"],
-        input[type="number"],
-        input[type="date"],
-        select,
-        textarea {
-            padding: 12px;
-            border: 1.5px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: inherit;
-            transition: border-color 0.2s;
-            width: 100%;
-        }
+    .meal-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 4px;
+    }
 
-        input[type="text"]:focus,
-        input[type="number"]:focus,
-        input[type="date"]:focus,
-        select:focus,
-        textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
+    .meal-nutrition {
+      font-size: 11px;
+      color: #666;
+    }
 
-        select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 20px;
-            padding-right: 40px;
-        }
+    .meal-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: 8px;
+    }
 
-        .radio-group {
-            display: flex;
-            gap: 16px;
-            margin: 12px 0;
-            flex-wrap: wrap;
-        }
+    .btn-small {
+      background: none;
+      border: none;
+      color: #667eea;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 4px 8px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
 
-        .radio-group label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-            font-weight: normal;
-            font-size: 14px;
-            color: #555;
-        }
+    .btn-small:hover {
+      background: rgba(102, 126, 234, 0.1);
+    }
 
-        .radio-group input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
+    .btn-small.delete {
+      color: #e74c3c;
+    }
 
-        .conditional-section {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 16px;
-            padding: 16px;
-            background: #f9fafb;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
+    /* SMART RECOMMENDATION */
+    .recommendation-section {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      color: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
 
-        .submit-btn {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 16px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 8px;
-        }
+    .recommendation-section h3 {
+      font-size: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 16px rgba(102, 126, 234, 0.3);
-        }
+    .recommendation-reason {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-bottom: 12px;
+      background: rgba(0,0,0,0.1);
+      padding: 8px;
+      border-radius: 6px;
+    }
 
-        .footer {
-            background: #f0f2f5;
-            padding: 16px 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-            border-top: 1px solid #ddd;
-            margin-top: 20px;
-        }
+    .recommendation-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-        @media (max-width: 600px) {
-            .header h1 { font-size: 24px; }
-            .metrics-grid { grid-template-columns: 1fr 1fr; }
-            .metric-value { font-size: 20px; }
-            .container { padding: 12px; }
-        }
-    </style>
+    .rec-card {
+      background: rgba(255,255,255,0.95);
+      color: #333;
+      padding: 12px;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .rec-info {
+      flex: 1;
+    }
+
+    .rec-name {
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .rec-nutrition {
+      font-size: 11px;
+      color: #666;
+    }
+
+    .btn-log {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s;
+      white-space: nowrap;
+      margin-left: 8px;
+    }
+
+    .btn-log:active {
+      transform: scale(0.95);
+    }
+
+    /* QUICK LOG BUTTONS */
+    .quick-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 16px 0;
+    }
+
+    .quick-btn {
+      background: white;
+      border: 2px solid #667eea;
+      color: #667eea;
+      padding: 14px 12px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .quick-btn:active {
+      background: #667eea;
+      color: white;
+      transform: scale(0.95);
+    }
+
+    /* HEALTH METRICS */
+    .metrics-section {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .metrics-section h3 {
+      font-size: 14px;
+      margin-bottom: 14px;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 8px;
+    }
+
+    .metric-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .metric-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .metric-input label {
+      flex: 1;
+      font-size: 13px;
+      color: #555;
+      font-weight: 500;
+    }
+
+    .metric-input input,
+    .metric-input select {
+      width: 70px;
+      padding: 8px;
+      border: 1.5px solid #ddd;
+      border-radius: 6px;
+      font-size: 12px;
+    }
+
+    .metric-input input:focus,
+    .metric-input select:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: flex-end;
+      z-index: 1000;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal {
+      background: white;
+      width: 100%;
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #eee;
+    }
+
+    .modal-header h2 {
+      font-size: 18px;
+      color: #333;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #999;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .form-group select,
+    .form-group input,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      font-family: inherit;
+    }
+
+    .form-group select:focus,
+    .form-group input:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .portion-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .portion-btn {
+      flex: 1;
+      padding: 12px;
+      border: 2px solid #ddd;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .portion-btn.active {
+      border-color: #667eea;
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+    }
+
+    .nutrition-preview {
+      background: #f0f4ff;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 12px;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:active {
+      transform: scale(0.95);
+    }
+
+    .btn-secondary {
+      background: #eee;
+      color: #333;
+    }
+
+    .btn-secondary:active {
+      background: #ddd;
+    }
+
+    /* FOOTER */
+    .footer {
+      background: #f0f2f5;
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 11px;
+      color: #666;
+      margin-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+
+    /* DESKTOP - Scale up a bit */
+    @media (min-width: 768px) {
+      .container {
+        max-width: 600px;
+        padding: 20px;
+      }
+
+      .progress-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .quick-buttons {
+        grid-template-columns: 1fr 1fr 1fr;
+      }
+
+      .modal {
+        width: 90%;
+        max-width: 500px;
+        margin: 0 auto;
+        border-radius: 12px;
+      }
+
+      .modal-overlay {
+        align-items: center;
+      }
+    }
+
+    /* UTILITY */
+    .hidden {
+      display: none;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #999;
+      padding: 20px;
+      font-style: italic;
+    }
+  </style>
 </head>
 <body>
-    <div id="root"></div>
+  <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState } = React;
+  <script type="text/babel">
+    // RESTAURANT & MEAL DATA
+    const RESTAURANTS = {
+      'Chick-fil-A': {
+        meals: [
+          { name: 'Spicy Chicken Combo', calories: 460, protein: 28, carbs: 41, fat: 19 },
+          { name: 'Grilled Chicken Sandwich', calories: 320, protein: 38, carbs: 26, fat: 6 }
+        ]
+      },
+      'Olive Garden': {
+        meals: [
+          { name: 'Grilled Chicken (base)', calories: 130, protein: 20, carbs: 5, fat: 4 },
+          { name: 'Chicken Giardino', calories: 530, protein: 28, carbs: 35, fat: 22 },
+          { name: 'Chicken Margherita', calories: 580, protein: 32, carbs: 38, fat: 24 }
+        ]
+      },
+      'Panera Bread': {
+        meals: [
+          { name: 'Turkey Sandwich', calories: 920, protein: 45, carbs: 90, fat: 30 },
+          { name: 'Chicken Sandwich', calories: 950, protein: 50, carbs: 95, fat: 32 },
+          { name: 'Salad with Grilled Chicken', calories: 520, protein: 42, carbs: 28, fat: 18 }
+        ]
+      },
+      'LongHorn Steakhouse': {
+        meals: [
+          { name: "Flo's Filet 6oz", calories: 330, protein: 37, carbs: 2, fat: 18 },
+          { name: "Flo's Filet 9oz", calories: 450, protein: 52, carbs: 3, fat: 25 },
+          { name: 'Filet with Mashed Potatoes & Veggies', calories: 650, protein: 52, carbs: 60, fat: 28 }
+        ]
+      },
+      'Darumas Japanese Steakhouse': {
+        meals: [
+          { name: 'Hibachi Steak & Rice & Veggies', calories: 800, protein: 45, carbs: 70, fat: 30 },
+          { name: 'Hibachi Chicken & Rice & Veggies', calories: 750, protein: 48, carbs: 65, fat: 24 }
+        ]
+      },
+      'Tropical Smoothie Cafe': {
+        meals: [
+          { name: 'Three Cheese Chicken Quesadilla', calories: 540, protein: 31, carbs: 39, fat: 27 }
+        ]
+      },
+      'Bonos BBQ': {
+        meals: [
+          { name: '4oz Pulled Pork Sandwich', calories: 340, protein: 30, carbs: 37, fat: 9 },
+          { name: 'Pork Hawg Sandwich', calories: 520, protein: 45, carbs: 55, fat: 14 },
+          { name: 'BBQ Salad with Pork', calories: 530, protein: 53, carbs: 17, fat: 28 }
+        ]
+      },
+      'Arbys': {
+        meals: [
+          { name: 'Classic Roast Beef', calories: 360, protein: 23, carbs: 37, fat: 14 },
+          { name: "Beef 'N Cheddar", calories: 450, protein: 23, carbs: 45, fat: 20 }
+        ]
+      },
+      'Bagels R Us': {
+        meals: [
+          { name: 'Egg & Cheese Bagel', calories: 475, protein: 23, carbs: 48, fat: 17 }
+        ]
+      },
+      "Miller's Ale House": {
+        meals: [
+          { name: 'Pork Osso Buco (Full)', calories: 1380, protein: 100, carbs: 120, fat: 65 }
+        ]
+      },
+      "Al's Pizza": {
+        meals: [
+          { name: 'Large Pepperoni Slice', calories: 325, protein: 12, carbs: 30, fat: 12 }
+        ]
+      },
+      'Papa Johns': {
+        meals: [
+          { name: 'Large Specialty Pepperoni (slice)', calories: 320, protein: 12, carbs: 36, fat: 13 }
+        ]
+      },
+      'Hot Wok': {
+        meals: [
+          { name: 'Sesame Chicken Fried Rice', calories: 399, protein: 12, carbs: 42, fat: 15 }
+        ]
+      },
+      'Rice Bowl': {
+        meals: [
+          { name: 'Beef Pho', calories: 475, protein: 30, carbs: 42, fat: 12 },
+          { name: 'Chicken Pho', calories: 400, protein: 28, carbs: 40, fat: 10 }
+        ]
+      },
+      'Tijuana Flats': {
+        meals: [
+          { name: 'Ground Beef Burrito', calories: 1360, protein: 53, carbs: 95, fat: 62 },
+          { name: 'Refried Beans Burrito', calories: 1210, protein: 33, carbs: 150, fat: 52 }
+        ]
+      },
+      'Salsas Mexican': {
+        meals: [
+          { name: 'Carne Asada Tacos (2)', calories: 400, protein: 25, carbs: 35, fat: 18 }
+        ]
+      },
+      'McDonalds': {
+        meals: [
+          { name: 'Big Mac', calories: 580, protein: 25, carbs: 46, fat: 30 },
+          { name: 'Double Cheeseburger', calories: 440, protein: 25, carbs: 35, fat: 20 },
+          { name: 'Double Big Mac', calories: 767, protein: 43, carbs: 45, fat: 46 }
+        ]
+      }
+    };
 
-        const MEAL_DATA = {
-            breakfast: [
-                { id: 'A', name: 'Eggs + toast + avocado', calories: 400, protein: 25, carbs: 35, fat: 18, fiber: 6 },
-                { id: 'B', name: 'Greek yogurt + granola + berries', calories: 385, protein: 32, carbs: 42, fat: 12, fiber: 6 },
-                { id: 'C', name: 'Protein shake + banana + almond butter', calories: 420, protein: 35, carbs: 48, fat: 14, fiber: 5 },
-                { id: 'D', name: 'Turkey + avocado wrap', calories: 420, protein: 32, carbs: 38, fat: 16, fiber: 7 },
-                { id: 'None', name: 'Coffee only (skip)', calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
-                { id: 'Other', name: 'Other (manual entry)', calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
-            ],
-            lunch: [
-                { id: 'A', name: 'Tuna sandwich', calories: 500, protein: 42, carbs: 48, fat: 16, fiber: 8 },
-                { id: 'B', name: 'Egg salad sandwich', calories: 480, protein: 38, carbs: 45, fat: 18, fiber: 7 },
-                { id: 'C', name: 'Chipotle chicken bowl', calories: 520, protein: 42, carbs: 52, fat: 18, fiber: 10 },
-                { id: 'D', name: 'Panera turkey sandwich', calories: 485, protein: 35, carbs: 50, fat: 14, fiber: 7 },
-                { id: 'E', name: 'Mexican fajitas', calories: 510, protein: 40, carbs: 48, fat: 16, fiber: 9 },
-                { id: 'F', name: 'Japanese sashimi/ramen', calories: 450, protein: 40, carbs: 35, fat: 15, fiber: 3 },
-                { id: 'Other', name: 'Other (manual entry)', calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
-            ],
-            dinner: [
-                { id: 'A', name: 'Chicken + rice + broccoli', calories: 550, protein: 45, carbs: 55, fat: 16, fiber: 8 },
-                { id: 'B', name: 'White fish + sweet potato + veggies', calories: 520, protein: 42, carbs: 48, fat: 15, fiber: 7 },
-                { id: 'C', name: 'Lean beef + pasta + salad', calories: 540, protein: 40, carbs: 52, fat: 16, fiber: 8 },
-                { id: 'D', name: 'Turkey tacos + beans', calories: 510, protein: 38, carbs: 48, fat: 16, fiber: 9 },
-                { id: 'E', name: 'Olive Garden grilled chicken', calories: 560, protein: 44, carbs: 50, fat: 18, fiber: 6 },
-                { id: 'Other', name: 'Other (manual entry)', calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
-            ],
-            snacks: [
-                { id: 'A', name: 'Protein shake', calories: 200, protein: 28, carbs: 22, fat: 4, fiber: 0 },
-                { id: 'B', name: 'Greek yogurt + berries', calories: 140, protein: 20, carbs: 18, fat: 2, fiber: 3 },
-                { id: 'C', name: 'Almonds + apple', calories: 240, protein: 8, carbs: 28, fat: 12, fiber: 5 },
-                { id: 'D', name: 'String cheese + orange', calories: 200, protein: 14, carbs: 24, fat: 8, fiber: 3 },
-                { id: 'None', name: 'No snack', calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 },
-                { id: 'Other', name: 'Other (manual entry)', calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 }
-            ]
-        };
+    // DAILY TARGETS
+    const DAILY_TARGETS = {
+      calories: 2500,
+      protein: 180,
+      carbs: 300,
+      fat: 70
+    };
 
-        function App() {
-            const today = new Date().toISOString().split('T')[0];
-            const [formData, setFormData] = useState({
-                date: today, breakfast: '', breakfastNotes: '', lunch: '', lunchNotes: '', dinner: '', dinnerNotes: '',
-                snacks: '', bikeYesNo: '', bikeDuration: '', bikeDistance: '', bikePeakHR: '', bikeFeeling: '', bikeNotes: '',
-                bikeWhyNot: '', cigarettes: '', difficulty: '', firstCigTime: '', smokingNotes: '', energy: '', mood: '',
-                sleepHours: '', generalNotes: ''
-            });
+    // RECOMMENDATION ENGINE
+    function generateRecommendations(meals, bikeCompleted) {
+      const totals = calculateTotals(meals);
+      const remaining = {
+        protein: DAILY_TARGETS.protein - totals.protein,
+        calories: DAILY_TARGETS.calories - totals.calories
+      };
 
-            const handleChange = (e) => {
-                const { name, value } = e.target;
-                setFormData(prev => ({ ...prev, [name]: value }));
-            };
+      const allMeals = [];
+      Object.entries(RESTAURANTS).forEach(([restaurant, data]) => {
+        data.meals.forEach(meal => {
+          allMeals.push({ restaurant, ...meal });
+        });
+      });
 
-            const calculateTotals = () => {
-                let totals = { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 };
-                ['breakfast', 'lunch', 'dinner', 'snacks'].forEach(mealType => {
-                    const selected = formData[mealType];
-                    if (selected) {
-                        const meal = MEAL_DATA[mealType].find(m => m.id === selected);
-                        if (meal) {
-                            totals.calories += meal.calories;
-                            totals.protein += meal.protein;
-                            totals.carbs += meal.carbs;
-                            totals.fat += meal.fat;
-                            totals.fiber += meal.fiber;
-                        }
-                    }
-                });
-                return totals;
-            };
+      // Score meals based on remaining needs
+      const scored = allMeals.map(meal => {
+        let score = 0;
 
-            const getMealName = (mealType, mealId) => {
-                if (!mealId) return '';
-                const meal = MEAL_DATA[mealType].find(m => m.id === mealId);
-                return meal ? meal.name : '';
-            };
-
-            const handleSubmit = (e) => {
-                e.preventDefault();
-                alert('Daily log saved! ✓\n\nPhase 2 coming next: Storage & Sync');
-                const resetData = { date: today, breakfast: '', breakfastNotes: '', lunch: '', lunchNotes: '', dinner: '', dinnerNotes: '', snacks: '', bikeYesNo: '', bikeDuration: '', bikeDistance: '', bikePeakHR: '', bikeFeeling: '', bikeNotes: '', bikeWhyNot: '', cigarettes: '', difficulty: '', firstCigTime: '', smokingNotes: '', energy: '', mood: '', sleepHours: '', generalNotes: '' };
-                setFormData(resetData);
-            };
-
-            const totals = calculateTotals();
-
-            return (
-                <div className="app">
-                    <header className="header">
-                        <h1>FLPP Daily Log</h1>
-                        <p className="subtitle">Fulmer Longevity & Performance Project</p>
-                    </header>
-
-                    <main className="container">
-                        <div className="summary-section">
-                            <h2>Today's Progress</h2>
-                            <div className="metrics-grid">
-                                <div className="metric-card"><span className="metric-label">Calories</span><span className="metric-value">{totals.calories}</span></div>
-                                <div className="metric-card"><span className="metric-label">Protein</span><span className="metric-value">{totals.protein}g</span></div>
-                                <div className="metric-card"><span className="metric-label">Carbs</span><span className="metric-value">{totals.carbs}g</span></div>
-                                <div className="metric-card"><span className="metric-label">Fat</span><span className="metric-value">{totals.fat}g</span></div>
-                            </div>
-                        </div>
-
-                        <form onSubmit={handleSubmit} className="log-form">
-                            <div className="form-section">
-                                <h3>📅 Date</h3>
-                                <input type="date" name="date" value={formData.date} onChange={handleChange} required />
-                            </div>
-
-                            <div className="form-section">
-                                <h3>🍽️ Meals</h3>
-                                <div className="meal-group">
-                                    <label>Breakfast</label>
-                                    <select name="breakfast" value={formData.breakfast} onChange={handleChange} required>
-                                        <option value="">-- Select --</option>
-                                        {MEAL_DATA.breakfast.map(meal => (<option key={meal.id} value={meal.id}>{meal.id}: {meal.name}</option>))}
-                                    </select>
-                                    {formData.breakfast && <div className="meal-info">{getMealName('breakfast', formData.breakfast)}</div>}
-                                    <input type="text" name="breakfastNotes" placeholder="Notes (optional)" value={formData.breakfastNotes} onChange={handleChange} />
-                                </div>
-                                <div className="meal-group">
-                                    <label>Lunch</label>
-                                    <select name="lunch" value={formData.lunch} onChange={handleChange} required>
-                                        <option value="">-- Select --</option>
-                                        {MEAL_DATA.lunch.map(meal => (<option key={meal.id} value={meal.id}>{meal.id}: {meal.name}</option>))}
-                                    </select>
-                                    {formData.lunch && <div className="meal-info">{getMealName('lunch', formData.lunch)}</div>}
-                                    <input type="text" name="lunchNotes" placeholder="Notes (optional)" value={formData.lunchNotes} onChange={handleChange} />
-                                </div>
-                                <div className="meal-group">
-                                    <label>Dinner</label>
-                                    <select name="dinner" value={formData.dinner} onChange={handleChange} required>
-                                        <option value="">-- Select --</option>
-                                        {MEAL_DATA.dinner.map(meal => (<option key={meal.id} value={meal.id}>{meal.id}: {meal.name}</option>))}
-                                    </select>
-                                    {formData.dinner && <div className="meal-info">{getMealName('dinner', formData.dinner)}</div>}
-                                    <input type="text" name="dinnerNotes" placeholder="Notes (optional)" value={formData.dinnerNotes} onChange={handleChange} />
-                                </div>
-                                <div className="meal-group">
-                                    <label>Snacks</label>
-                                    <select name="snacks" value={formData.snacks} onChange={handleChange} required>
-                                        <option value="">-- Select --</option>
-                                        {MEAL_DATA.snacks.map(meal => (<option key={meal.id} value={meal.id}>{meal.id}: {meal.name}</option>))}
-                                    </select>
-                                    {formData.snacks && <div className="meal-info">{getMealName('snacks', formData.snacks)}</div>}
-                                </div>
-                            </div>
-
-                            <div className="form-section">
-                                <h3>🚴 Zone 2 Cycling</h3>
-                                <div className="radio-group">
-                                    <label><input type="radio" name="bikeYesNo" value="Yes" checked={formData.bikeYesNo === 'Yes'} onChange={handleChange} /> Yes</label>
-                                    <label><input type="radio" name="bikeYesNo" value="No" checked={formData.bikeYesNo === 'No'} onChange={handleChange} /> No</label>
-                                </div>
-                                {formData.bikeYesNo === 'Yes' && (
-                                    <div className="conditional-section">
-                                        <input type="number" name="bikeDuration" placeholder="Duration (minutes)" value={formData.bikeDuration} onChange={handleChange} />
-                                        <input type="number" name="bikeDistance" placeholder="Distance (miles)" value={formData.bikeDistance} onChange={handleChange} />
-                                        <input type="number" name="bikePeakHR" placeholder="Peak HR (bpm)" value={formData.bikePeakHR} onChange={handleChange} />
-                                        <select name="bikeFeeling" value={formData.bikeFeeling} onChange={handleChange}>
-                                            <option value="">How did you feel? (1-10)</option>
-                                            {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                                        </select>
-                                        <input type="text" name="bikeNotes" placeholder="Bike notes (optional)" value={formData.bikeNotes} onChange={handleChange} />
-                                    </div>
-                                )}
-                                {formData.bikeYesNo === 'No' && (
-                                    <div className="conditional-section">
-                                        <select name="bikeWhyNot" value={formData.bikeWhyNot} onChange={handleChange}>
-                                            <option value="">Why not?</option>
-                                            <option value="Rest day">Rest day</option>
-                                            <option value="Busy">Busy</option>
-                                            <option value="Weather">Weather</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="form-section">
-                                <h3>🚬 Smoking</h3>
-                                <input type="number" name="cigarettes" placeholder="Cigarettes today" value={formData.cigarettes} onChange={handleChange} />
-                                <select name="difficulty" value={formData.difficulty} onChange={handleChange}>
-                                    <option value="">Difficulty (1-10)</option>
-                                    {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                                </select>
-                                <input type="number" name="firstCigTime" placeholder="First cigarette (min after waking)" value={formData.firstCigTime} onChange={handleChange} />
-                                <input type="text" name="smokingNotes" placeholder="Smoking notes (optional)" value={formData.smokingNotes} onChange={handleChange} />
-                            </div>
-
-                            <div className="form-section">
-                                <h3>❤️ Health Metrics</h3>
-                                <select name="energy" value={formData.energy} onChange={handleChange}>
-                                    <option value="">Energy (1-10)</option>
-                                    {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                                </select>
-                                <select name="mood" value={formData.mood} onChange={handleChange}>
-                                    <option value="">Mood (1-10)</option>
-                                    {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                                </select>
-                                <input type="number" name="sleepHours" placeholder="Sleep hours" step="0.5" value={formData.sleepHours} onChange={handleChange} />
-                                <textarea name="generalNotes" placeholder="General notes (optional)" value={formData.generalNotes} onChange={handleChange} rows="3"></textarea>
-                            </div>
-
-                            <button type="submit" className="submit-btn">Save Daily Log</button>
-                        </form>
-                    </main>
-
-                    <footer className="footer">
-                        <p>Phase 1: Core App ✓ | Phase 2: Storage & Sync Coming Next</p>
-                    </footer>
-                </div>
-            );
+        // Prioritize protein if needed
+        if (remaining.protein > 30) {
+          score += meal.protein * 2;
+        } else if (remaining.protein > 0) {
+          score += meal.protein;
         }
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
+        // Don't exceed calories
+        if (meal.calories > remaining.calories) {
+          score -= 1000;
+        }
+
+        // Prefer balanced macros
+        if (meal.protein >= 25 && meal.fat <= 30) score += 50;
+
+        return { ...meal, score };
+      });
+
+      return scored
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(m => {
+          const { score, ...meal } = m;
+          return meal;
+        });
+    }
+
+    function calculateTotals(meals) {
+      return meals.reduce((acc, meal) => ({
+        calories: acc.calories + (meal.calories || 0),
+        protein: acc.protein + (meal.protein || 0),
+        carbs: acc.carbs + (meal.carbs || 0),
+        fat: acc.fat + (meal.fat || 0)
+      }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+    }
+
+    // MAIN APP
+    function App() {
+      const today = new Date().toISOString().split('T')[0];
+
+      // Load from localStorage
+      const [meals, setMeals] = React.useState(() => {
+        const stored = localStorage.getItem(`meals-${today}`);
+        return stored ? JSON.parse(stored) : [];
+      });
+
+      const [metrics, setMetrics] = React.useState(() => {
+        const stored = localStorage.getItem(`metrics-${today}`);
+        return stored ? JSON.parse(stored) : {
+          energy: 5,
+          mood: 5,
+          sleep: 7,
+          cigarettes: 0,
+          bikeCompleted: false,
+          bikeDuration: 0
+        };
+      });
+
+      const [showMealModal, setShowMealModal] = React.useState(false);
+      const [mealType, setMealType] = React.useState('lunch');
+      const [selectedRestaurant, setSelectedRestaurant] = React.useState('');
+      const [selectedMeal, setSelectedMeal] = React.useState('');
+      const [portion, setPortion] = React.useState('standard');
+      const [notes, setNotes] = React.useState('');
+
+      // Save to localStorage
+      React.useEffect(() => {
+        localStorage.setItem(`meals-${today}`, JSON.stringify(meals));
+      }, [meals, today]);
+
+      React.useEffect(() => {
+        localStorage.setItem(`metrics-${today}`, JSON.stringify(metrics));
+      }, [metrics, today]);
+
+      const totals = calculateTotals(meals);
+      const recommendations = generateRecommendations(meals, metrics.bikeCompleted);
+
+      const handleAddMeal = () => {
+        if (!selectedRestaurant || !selectedMeal) return;
+
+        const restaurant = RESTAURANTS[selectedRestaurant];
+        const meal = restaurant.meals.find(m => m.name === selectedMeal);
+
+        if (!meal) return;
+
+        // Apply portion multiplier
+        const multiplier = portion === 'smaller' ? 0.75 : portion === 'larger' ? 1.25 : 1;
+
+        const newMeal = {
+          id: Date.now(),
+          mealType,
+          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+          restaurant: selectedRestaurant,
+          name: selectedMeal,
+          calories: Math.round(meal.calories * multiplier),
+          protein: Math.round(meal.protein * multiplier),
+          carbs: Math.round(meal.carbs * multiplier),
+          fat: Math.round(meal.fat * multiplier),
+          notes
+        };
+
+        setMeals([...meals, newMeal]);
+
+        // Reset form
+        setShowMealModal(false);
+        setSelectedRestaurant('');
+        setSelectedMeal('');
+        setPortion('standard');
+        setNotes('');
+      };
+
+      const handleDeleteMeal = (id) => {
+        setMeals(meals.filter(m => m.id !== id));
+      };
+
+      const getProgressPercent = (value, target) => {
+        return Math.min((value / target) * 100, 100);
+      };
+
+      return (
+        <div className="app">
+          <header className="header">
+            <h1>🍽️ FLPP Daily Log</h1>
+            <p className="subtitle">Fulmer Longevity & Performance Project</p>
+          </header>
+
+          <main className="container">
+            {/* PROGRESS METRICS */}
+            <div className="progress-grid">
+              <div className="metric-card">
+                <span className="metric-label">Calories</span>
+                <span className="metric-value">{totals.calories}</span>
+                <span className="metric-target">/{DAILY_TARGETS.calories}</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${getProgressPercent(totals.calories, DAILY_TARGETS.calories)}%` }}></div>
+                </div>
+              </div>
+
+              <div className="metric-card">
+                <span className="metric-label">Protein</span>
+                <span className="metric-value">{totals.protein}g</span>
+                <span className="metric-target">/{DAILY_TARGETS.protein}g</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${getProgressPercent(totals.protein, DAILY_TARGETS.protein)}%` }}></div>
+                </div>
+              </div>
+
+              <div className="metric-card">
+                <span className="metric-label">Carbs</span>
+                <span className="metric-value">{totals.carbs}g</span>
+                <span className="metric-target">/{DAILY_TARGETS.carbs}g</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${getProgressPercent(totals.carbs, DAILY_TARGETS.carbs)}%` }}></div>
+                </div>
+              </div>
+
+              <div className="metric-card">
+                <span className="metric-label">Fat</span>
+                <span className="metric-value">{totals.fat}g</span>
+                <span className="metric-target">/{DAILY_TARGETS.fat}g</span>
+                <div className="progress-bar">
+                  <div className="progress-fill" style={{ width: `${getProgressPercent(totals.fat, DAILY_TARGETS.fat)}%` }}></div>
+                </div>
+              </div>
+            </div>
+
+            {/* QUICK LOG BUTTONS */}
+            <div className="quick-buttons">
+              <button className="quick-btn" onClick={() => { setMealType('breakfast'); setShowMealModal(true); }}>🌅 Breakfast</button>
+              <button className="quick-btn" onClick={() => { setMealType('lunch'); setShowMealModal(true); }}>🥗 Lunch</button>
+              <button className="quick-btn" onClick={() => { setMealType('dinner'); setShowMealModal(true); }}>🍽️ Dinner</button>
+              <button className="quick-btn" onClick={() => { setMealType('snack'); setShowMealModal(true); }}>🍎 Snack</button>
+              <button className="quick-btn" onClick={() => { setMealType('bike'); setShowMealModal(true); }}>🚴 Post-Ride</button>
+              <button className="quick-btn" onClick={() => { setMealType('custom'); setShowMealModal(true); }}>➕ Custom</button>
+            </div>
+
+            {/* MEALS LIST */}
+            <div className="meals-section">
+              <h2>📋 Today's Meals</h2>
+              {meals.length === 0 ? (
+                <div className="meal-item empty">No meals logged yet. Start tracking!</div>
+              ) : (
+                meals.map(meal => (
+                  <div key={meal.id} className="meal-item">
+                    <div className="meal-info">
+                      <div className="meal-time">{meal.time}</div>
+                      <div className="meal-name">{meal.restaurant} - {meal.name}</div>
+                      <div className="meal-nutrition">
+                        {meal.calories}cal | {meal.protein}g protein | {meal.carbs}g carbs | {meal.fat}g fat
+                      </div>
+                    </div>
+                    <div className="meal-actions">
+                      <button className="btn-small delete" onClick={() => handleDeleteMeal(meal.id)}>✕</button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* SMART RECOMMENDATIONS */}
+            {recommendations.length > 0 && (
+              <div className="recommendation-section">
+                <h3>💡 Smart Recommendations</h3>
+                <div className="recommendation-reason">
+                  You need {DAILY_TARGETS.protein - totals.protein}g more protein. Refuel wisely!
+                </div>
+                <div className="recommendation-cards">
+                  {recommendations.map((rec, idx) => (
+                    <div key={idx} className="rec-card">
+                      <div className="rec-info">
+                        <div className="rec-name">{rec.restaurant}</div>
+                        <div className="rec-nutrition">{rec.name} • {rec.calories}cal • {rec.protein}g protein</div>
+                      </div>
+                      <button className="btn-log" onClick={() => {
+                        setSelectedRestaurant(rec.restaurant);
+                        setSelectedMeal(rec.name);
+                        setMealType('lunch');
+                        setShowMealModal(true);
+                      }}>Log</button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* HEALTH METRICS */}
+            <div className="metrics-section">
+              <h3>❤️ Health Metrics</h3>
+              <div className="metric-input-group">
+                <div className="metric-input">
+                  <label>Energy Level</label>
+                  <select value={metrics.energy} onChange={(e) => setMetrics({...metrics, energy: parseInt(e.target.value)})}>
+                    {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </div>
+
+                <div className="metric-input">
+                  <label>Mood</label>
+                  <select value={metrics.mood} onChange={(e) => setMetrics({...metrics, mood: parseInt(e.target.value)})}>
+                    {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
+                  </select>
+                </div>
+
+                <div className="metric-input">
+                  <label>Sleep Hours</label>
+                  <input type="number" step="0.5" min="0" max="12" value={metrics.sleep} onChange={(e) => setMetrics({...metrics, sleep: parseFloat(e.target.value)})} />
+                </div>
+
+                <div className="metric-input">
+                  <label>Cigarettes</label>
+                  <input type="number" min="0" value={metrics.cigarettes} onChange={(e) => setMetrics({...metrics, cigarettes: parseInt(e.target.value)})} />
+                </div>
+
+                <div className="metric-input">
+                  <label>Zone 2 Bike</label>
+                  <input type="number" min="0" max="300" value={metrics.bikeDuration} placeholder="mins" onChange={(e) => setMetrics({...metrics, bikeDuration: parseInt(e.target.value), bikeCompleted: parseInt(e.target.value) > 0})} />
+                </div>
+              </div>
+            </div>
+          </main>
+
+          {/* MEAL LOGGING MODAL */}
+          {showMealModal && (
+            <div className="modal-overlay" onClick={() => setShowMealModal(false)}>
+              <div className="modal" onClick={(e) => e.stopPropagation()}>
+                <div className="modal-header">
+                  <h2>📝 Log Meal</h2>
+                  <button className="btn-close" onClick={() => setShowMealModal(false)}>✕</button>
+                </div>
+
+                {mealType !== 'custom' ? (
+                  <>
+                    <div className="form-group">
+                      <label>Restaurant</label>
+                      <select value={selectedRestaurant} onChange={(e) => { setSelectedRestaurant(e.target.value); setSelectedMeal(''); }}>
+                        <option value="">Choose a restaurant...</option>
+                        {Object.keys(RESTAURANTS).map(r => <option key={r} value={r}>{r}</option>)}
+                      </select>
+                    </div>
+
+                    {selectedRestaurant && (
+                      <div className="form-group">
+                        <label>Meal</label>
+                        <select value={selectedMeal} onChange={(e) => setSelectedMeal(e.target.value)}>
+                          <option value="">Choose a meal...</option>
+                          {RESTAURANTS[selectedRestaurant].meals.map(m => (
+                            <option key={m.name} value={m.name}>{m.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    {selectedMeal && (
+                      <>
+                        <div className="form-group">
+                          <label>Portion Size</label>
+                          <div className="portion-selector">
+                            <button className={`portion-btn ${portion === 'smaller' ? 'active' : ''}`} onClick={() => setPortion('smaller')}>Smaller</button>
+                            <button className={`portion-btn ${portion === 'standard' ? 'active' : ''}`} onClick={() => setPortion('standard')}>Standard</button>
+                            <button className={`portion-btn ${portion === 'larger' ? 'active' : ''}`} onClick={() => setPortion('larger')}>Larger</button>
+                          </div>
+                        </div>
+
+                        {(() => {
+                          const restaurant = RESTAURANTS[selectedRestaurant];
+                          const meal = restaurant.meals.find(m => m.name === selectedMeal);
+                          const multiplier = portion === 'smaller' ? 0.75 : portion === 'larger' ? 1.25 : 1;
+                          return (
+                            <div className="nutrition-preview">
+                              {Math.round(meal.calories * multiplier)} cal | {Math.round(meal.protein * multiplier)}g protein | {Math.round(meal.carbs * multiplier)}g carbs | {Math.round(meal.fat * multiplier)}g fat
+                            </div>
+                          );
+                        })()}
+                      </>
+                    )}
+
+                    <div className="form-group">
+                      <label>Notes (optional)</label>
+                      <input type="text" placeholder="e.g., no oil, extra protein..." value={notes} onChange={(e) => setNotes(e.target.value)} />
+                    </div>
+
+                    <div className="modal-buttons">
+                      <button className="btn-secondary" onClick={() => setShowMealModal(false)}>Cancel</button>
+                      <button className="btn-primary" onClick={handleAddMeal} disabled={!selectedRestaurant || !selectedMeal}>Save Meal</button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="empty-state">Custom meal entry coming soon!</div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <footer className="footer">
+            <p>Phase 2 Live ✓ | Mobile-First | Real-Time Tracking | Local Storage Active</p>
+          </footer>
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
 </body>
 </html>
