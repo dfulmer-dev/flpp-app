@@ -771,6 +771,7 @@
       const [customCarbs, setCustomCarbs] = React.useState('');
       const [customFat, setCustomFat] = React.useState('');
       const [formError, setFormError] = React.useState('');
+      const [searchTimeout, setSearchTimeout] = React.useState(null);
 
       React.useEffect(() => {
         localStorage.setItem(`meals-${today}`, JSON.stringify(meals));
@@ -784,20 +785,32 @@
       const totals = calculateTotals(meals);
       const recommendations = generateRecommendations(meals);
 
-      const handleSearchMeal = React.useCallback(async (query) => {
+      const handleSearchMeal = (query) => {
         setCustomSearchQuery(query);
+
+        // Clear previous timeout
+        if (searchTimeout) clearTimeout(searchTimeout);
+
         if (query.length < 2) {
           setSearchResults([]);
           return;
         }
 
-        setIsSearching(true);
-        const results = await searchNutritionix(query);
-        setSearchResults(results.slice(0, 5));
-        setIsSearching(false);
-      }, []);
+        // Debounce: wait 400ms after user stops typing
+        const timeout = setTimeout(async () => {
+          setIsSearching(true);
+          const results = await searchNutritionix(query);
+          setSearchResults(results.slice(0, 8)); // Show 8 results for better visibility
+          setIsSearching(false);
+        }, 400);
 
-      const handleSelectSearchResult = (result) => {
+        setSearchTimeout(timeout);
+      };
+
+      const handleSelectSearchResult = (result, e) => {
+        if (e) {
+          e.stopPropagation();
+        }
         setCustomMealName(result.food_name);
         setCustomCalories(Math.round(result.nf_calories).toString());
         setCustomProtein(Math.round(result.nf_protein).toString());
@@ -1115,12 +1128,12 @@
                     </div>
 
                     {searchResults.length > 0 && (
-                      <div className="search-results">
+                      <div className="search-results" onClick={(e) => e.stopPropagation()}>
                         {searchResults.map((result, idx) => (
                           <div
                             key={idx}
                             className="search-result-item"
-                            onClick={() => handleSelectSearchResult(result)}
+                            onClick={(e) => handleSelectSearchResult(result, e)}
                           >
                             <div className="result-name">{result.food_name}</div>
                             <div className="result-nutrition">
