@@ -1,1262 +1,460 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FLPP Phase 2 - Smart Nutrition Tracker</title>
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      background: #f5f7fa;
-      min-height: 100vh;
-    }
-
-    .app {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      background: #f5f7fa;
-    }
-
-    /* HEADER */
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 16px 16px;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 100;
-    }
-
-    .header h1 {
-      font-size: 24px;
-      margin-bottom: 4px;
-      font-weight: 700;
-    }
-
-    .header .subtitle {
-      font-size: 12px;
-      opacity: 0.9;
-    }
-
-    /* MAIN CONTAINER */
-    .container {
-      flex: 1;
-      padding: 16px;
-      max-width: 100%;
-      margin: 0 auto;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      padding-bottom: 100px;
-    }
-
-    /* PROGRESS CARDS */
-    .progress-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    .metric-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 16px;
-      border-radius: 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .metric-label {
-      font-size: 11px;
-      opacity: 0.9;
-      margin-bottom: 8px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 600;
-    }
-
-    .metric-value {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .metric-target {
-      font-size: 10px;
-      opacity: 0.8;
-    }
-
-    .progress-bar {
-      width: 100%;
-      height: 4px;
-      background: rgba(255,255,255,0.3);
-      border-radius: 2px;
-      margin-top: 8px;
-      overflow: hidden;
-    }
-
-    .progress-fill {
-      height: 100%;
-      background: #fff;
-      border-radius: 2px;
-      transition: width 0.3s ease;
-    }
-
-    /* MEALS LIST */
-    .meals-section {
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .meals-section h2 {
-      font-size: 16px;
-      margin-bottom: 12px;
-      color: #333;
-      border-bottom: 2px solid #667eea;
-      padding-bottom: 8px;
-    }
-
-    .meal-item {
-      padding: 12px;
-      margin-bottom: 10px;
-      background: #f9fafb;
-      border-radius: 8px;
-      border-left: 4px solid #667eea;
-      display: flex;
-      justify-content: space-between;
-      align-items: start;
-    }
-
-    .meal-item.empty {
-      color: #999;
-      font-style: italic;
-      border-left-color: #ccc;
-    }
-
-    .meal-info {
-      flex: 1;
-    }
-
-    .meal-time {
-      font-size: 12px;
-      color: #667eea;
-      font-weight: 600;
-      margin-bottom: 2px;
-    }
-
-    .meal-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 4px;
-    }
-
-    .meal-nutrition {
-      font-size: 11px;
-      color: #666;
-    }
-
-    .meal-actions {
-      display: flex;
-      gap: 8px;
-      margin-left: 8px;
-    }
-
-    .btn-small {
-      background: none;
-      border: none;
-      color: #667eea;
-      cursor: pointer;
-      font-size: 14px;
-      padding: 4px 8px;
-      border-radius: 4px;
-      transition: background 0.2s;
-    }
-
-    .btn-small:hover {
-      background: rgba(102, 126, 234, 0.1);
-    }
-
-    .btn-small.delete {
-      color: #e74c3c;
-    }
-
-    /* RECOMMENDATION */
-    .recommendation-section {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-
-    .recommendation-section h3 {
-      font-size: 14px;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .recommendation-reason {
-      font-size: 12px;
-      opacity: 0.9;
-      margin-bottom: 12px;
-      background: rgba(0,0,0,0.1);
-      padding: 8px;
-      border-radius: 6px;
-    }
-
-    .recommendation-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .rec-card {
-      background: rgba(255,255,255,0.95);
-      color: #333;
-      padding: 12px;
-      border-radius: 8px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .rec-info {
-      flex: 1;
-    }
-
-    .rec-name {
-      font-weight: 600;
-      font-size: 13px;
-      margin-bottom: 2px;
-    }
-
-    .rec-nutrition {
-      font-size: 11px;
-      color: #666;
-    }
-
-    .btn-log {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s;
-      white-space: nowrap;
-      margin-left: 8px;
-    }
-
-    .btn-log:active {
-      transform: scale(0.95);
-    }
-
-    /* QUICK LOG BUTTONS */
-    .quick-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 16px 0;
-    }
-
-    .quick-btn {
-      background: white;
-      border: 2px solid #667eea;
-      color: #667eea;
-      padding: 14px 12px;
-      border-radius: 10px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-
-    .quick-btn:active {
-      background: #667eea;
-      color: white;
-      transform: scale(0.95);
-    }
-
-    /* HEALTH METRICS */
-    .metrics-section {
-      background: white;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .metrics-section h3 {
-      font-size: 14px;
-      margin-bottom: 14px;
-      color: #333;
-      border-bottom: 2px solid #667eea;
-      padding-bottom: 8px;
-    }
-
-    .metric-input-group {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .metric-input {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .metric-input label {
-      flex: 1;
-      font-size: 13px;
-      color: #555;
-      font-weight: 500;
-    }
-
-    .metric-input input,
-    .metric-input select {
-      width: 70px;
-      padding: 8px;
-      border: 1.5px solid #ddd;
-      border-radius: 6px;
-      font-size: 12px;
-    }
-
-    /* MODAL */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: flex;
-      align-items: flex-end;
-      z-index: 1000;
-      animation: fadeIn 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    .modal {
-      background: white;
-      width: 100%;
-      border-radius: 20px 20px 0 0;
-      padding: 20px;
-      max-height: 85vh;
-      overflow-y: auto;
-      animation: slideUp 0.3s ease;
-    }
-
-    @keyframes slideUp {
-      from { transform: translateY(100%); }
-      to { transform: translateY(0); }
-    }
-
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #eee;
-    }
-
-    .modal-header h2 {
-      font-size: 18px;
-      color: #333;
-    }
-
-    .btn-close {
-      background: none;
-      border: none;
-      font-size: 24px;
-      cursor: pointer;
-      color: #999;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
-    }
-
-    .form-group input,
-    .form-group select {
-      width: 100%;
-      padding: 12px;
-      border: 1.5px solid #ddd;
-      border-radius: 8px;
-      font-size: 14px;
-      font-family: inherit;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
-    .search-results {
-      background: #f9fafb;
-      border-radius: 8px;
-      max-height: 300px;
-      overflow-y: auto;
-      margin-bottom: 16px;
-    }
-
-    .search-result-item {
-      padding: 12px;
-      border-bottom: 1px solid #eee;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .search-result-item:hover {
-      background: #f0f4ff;
-    }
-
-    .search-result-item:last-child {
-      border-bottom: none;
-    }
-
-    .result-name {
-      font-weight: 600;
-      font-size: 13px;
-      color: #333;
-      margin-bottom: 4px;
-    }
-
-    .result-nutrition {
-      font-size: 11px;
-      color: #666;
-    }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 3px solid #eee;
-      border-top-color: #667eea;
-      border-radius: 50%;
-      animation: spin 0.6s linear infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .error-message {
-      color: #e74c3c;
-      font-size: 12px;
-      margin-top: 4px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .nutrition-preview {
-      background: #f0f4ff;
-      padding: 12px;
-      border-radius: 8px;
-      margin: 16px 0;
-      font-size: 12px;
-      color: #667eea;
-      font-weight: 600;
-    }
-
-    .modal-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .btn-primary,
-    .btn-secondary {
-      flex: 1;
-      padding: 14px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    .btn-primary:active:not(:disabled) {
-      transform: scale(0.95);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .btn-secondary {
-      background: #eee;
-      color: #333;
-    }
-
-    .btn-secondary:active {
-      background: #ddd;
-    }
-
-    .footer {
-      background: #f0f2f5;
-      padding: 12px 16px;
-      text-align: center;
-      font-size: 11px;
-      color: #666;
-      margin-top: 20px;
-      border-top: 1px solid #ddd;
-    }
-
-    .empty-state {
-      text-align: center;
-      color: #999;
-      padding: 20px;
-      font-style: italic;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FLPP - Meal Logger</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f9fa; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 16px; background: white; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 24px 16px; border-radius: 12px; margin-bottom: 24px; box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
+        .header h1 { font-size: 28px; margin-bottom: 8px; }
+        .header p { font-size: 13px; opacity: 0.9; }
+        .date-display { font-size: 12px; opacity: 0.8; margin-top: 8px; }
+        .metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .metric-card { background: #f5f7fa; padding: 12px; border-radius: 8px; border-left: 4px solid #667eea; }
+        .metric-label { font-size: 12px; color: #666; margin-bottom: 6px; }
+        .metric-value { font-size: 18px; font-weight: bold; color: #333; margin-bottom: 6px; }
+        .progress-bar { height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: #667eea; transition: width 0.3s ease; }
+        .search-section { margin-bottom: 24px; }
+        .search-input { width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; margin-bottom: 12px; transition: border-color 0.2s; }
+        .search-input:focus { outline: none; border-color: #667eea; }
+        .search-results { max-height: 320px; overflow-y: auto; background: #f9fafb; border-radius: 8px; margin-bottom: 12px; }
+        .result-item { padding: 12px; border-bottom: 1px solid #e0e0e0; cursor: pointer; transition: background 0.2s; }
+        .result-item:hover { background: #f0f0f0; }
+        .result-name { font-weight: 500; font-size: 14px; margin-bottom: 4px; }
+        .result-nutrition { font-size: 12px; color: #666; }
+        .no-results { padding: 16px; text-align: center; color: #999; font-size: 14px; }
+        .quick-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 24px; }
+        .quick-btn { padding: 12px; background: #f5f7fa; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; }
+        .quick-btn:active { background: #667eea; color: white; border-color: #667eea; }
+        .meals-section { margin-bottom: 24px; }
+        .section-title { font-size: 14px; font-weight: 600; color: #667eea; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .meal-card { background: #f9fafb; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: flex-start; border-left: 4px solid #667eea; }
+        .meal-info { flex: 1; }
+        .meal-name { font-weight: 500; font-size: 14px; margin-bottom: 4px; }
+        .meal-nutrition { font-size: 11px; color: #666; }
+        .meal-delete { background: #fee; color: #c00; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 11px; margin-left: 8px; }
+        .meal-delete:hover { background: #fcc; }
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: flex-end; }
+        .modal.active { display: flex; }
+        .modal-content { width: 100%; background: white; padding: 20px; border-radius: 12px 12px 0 0; max-height: 80vh; overflow-y: auto; }
+        .modal-close { float: right; background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+        .modal-close:hover { color: #333; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #333; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #667eea; }
+        .form-group button { width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .form-group button:hover { opacity: 0.9; }
+        .error-message { color: #c00; font-size: 12px; margin-top: 4px; }
+        .serving-options { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 12px 0; }
+        .serving-option { padding: 12px; border: 2px solid #e0e0e0; border-radius: 6px; text-align: center; cursor: pointer; font-size: 13px; }
+        .serving-option:hover { border-color: #667eea; background: #f9fafb; }
+        .serving-option.selected { background: #667eea; color: white; border-color: #667eea; }
+    </style>
 </head>
 <body>
-  <div id="root"></div>
-
-  <script type="text/babel">
-    // RESTAURANT DATA
-    const RESTAURANTS = {
-      'Home Cooked / Publix': {
-        meals: [
-          { name: 'Search Publix ingredients below', custom: true }
-        ]
-      },
-      'Chick-fil-A': {
-        meals: [
-          { name: 'Spicy Chicken Combo', calories: 460, protein: 28, carbs: 41, fat: 19 },
-          { name: 'Grilled Chicken Sandwich', calories: 320, protein: 38, carbs: 26, fat: 6 }
-        ]
-      },
-      'Olive Garden': {
-        meals: [
-          { name: 'Grilled Chicken (base)', calories: 130, protein: 20, carbs: 5, fat: 4 },
-          { name: 'Chicken Giardino', calories: 530, protein: 28, carbs: 35, fat: 22 }
-        ]
-      },
-      'Panera Bread': {
-        meals: [
-          { name: 'Turkey Sandwich', calories: 920, protein: 45, carbs: 90, fat: 30 },
-          { name: 'Chicken Sandwich', calories: 950, protein: 50, carbs: 95, fat: 32 }
-        ]
-      },
-      'LongHorn Steakhouse': {
-        meals: [
-          { name: "Flo's Filet 6oz", calories: 330, protein: 37, carbs: 2, fat: 18 },
-          { name: "Flo's Filet 9oz", calories: 450, protein: 52, carbs: 3, fat: 25 }
-        ]
-      },
-      'Darumas Japanese Steakhouse': {
-        meals: [
-          { name: 'Hibachi Steak & Rice & Veggies', calories: 800, protein: 45, carbs: 70, fat: 30 }
-        ]
-      },
-      'Tropical Smoothie Cafe': {
-        meals: [
-          { name: 'Three Cheese Chicken Quesadilla', calories: 540, protein: 31, carbs: 39, fat: 27 }
-        ]
-      },
-      'Bonos BBQ': {
-        meals: [
-          { name: '4oz Pulled Pork Sandwich', calories: 340, protein: 30, carbs: 37, fat: 9 },
-          { name: 'Pork Hawg Sandwich', calories: 520, protein: 45, carbs: 55, fat: 14 }
-        ]
-      },
-      'Arbys': {
-        meals: [
-          { name: 'Classic Roast Beef', calories: 360, protein: 23, carbs: 37, fat: 14 }
-        ]
-      },
-      'Bagels R Us': {
-        meals: [
-          { name: 'Egg & Cheese Bagel', calories: 475, protein: 23, carbs: 48, fat: 17 }
-        ]
-      },
-      "Miller's Ale House": {
-        meals: [
-          { name: 'Pork Osso Buco (Full)', calories: 1380, protein: 100, carbs: 120, fat: 65 }
-        ]
-      },
-      "Al's Pizza": {
-        meals: [
-          { name: 'Large Pepperoni Slice', calories: 325, protein: 12, carbs: 30, fat: 12 }
-        ]
-      },
-      'Papa Johns': {
-        meals: [
-          { name: 'Large Specialty Pepperoni (slice)', calories: 320, protein: 12, carbs: 36, fat: 13 }
-        ]
-      },
-      'Hot Wok': {
-        meals: [
-          { name: 'Sesame Chicken Fried Rice', calories: 399, protein: 12, carbs: 42, fat: 15 }
-        ]
-      },
-      'Rice Bowl': {
-        meals: [
-          { name: 'Beef Pho', calories: 475, protein: 30, carbs: 42, fat: 12 }
-        ]
-      },
-      'Tijuana Flats': {
-        meals: [
-          { name: 'Ground Beef Burrito', calories: 1360, protein: 53, carbs: 95, fat: 62 }
-        ]
-      },
-      'Salsas Mexican': {
-        meals: [
-          { name: 'Carne Asada Tacos (2)', calories: 400, protein: 25, carbs: 35, fat: 18 }
-        ]
-      },
-      'McDonalds': {
-        meals: [
-          { name: 'Big Mac', calories: 580, protein: 25, carbs: 46, fat: 30 }
-        ]
-      }
-    };
-
-    const DAILY_TARGETS = {
-      calories: 2500,
-      protein: 180,
-      carbs: 300,
-      fat: 70
-    };
-
-    // NUTRITIONIX SEARCH FUNCTION
-    async function searchNutritionix(query) {
-      try {
-        const response = await fetch(`https://www.nutritionix.com/search/instant?q=${encodeURIComponent(query)}&self=true&mobile=false`);
-        const data = await response.json();
-
-        return data.common || [];
-      } catch (error) {
-        console.error('Search error:', error);
-        return [];
-      }
-    }
-
-    function generateRecommendations(meals) {
-      const totals = calculateTotals(meals);
-      const remaining = {
-        protein: DAILY_TARGETS.protein - totals.protein,
-        calories: DAILY_TARGETS.calories - totals.calories
-      };
-
-      const allMeals = [];
-      Object.entries(RESTAURANTS).forEach(([restaurant, data]) => {
-        if (restaurant !== 'Home Cooked / Publix') {
-          data.meals.forEach(meal => {
-            if (!meal.custom) {
-              allMeals.push({ restaurant, ...meal });
-            }
-          });
-        }
-      });
-
-      const scored = allMeals.map(meal => {
-        let score = 0;
-        if (remaining.protein > 30) {
-          score += meal.protein * 2;
-        } else if (remaining.protein > 0) {
-          score += meal.protein;
-        }
-        if (meal.calories > remaining.calories) {
-          score -= 1000;
-        }
-        if (meal.protein >= 25 && meal.fat <= 30) score += 50;
-        return { ...meal, score };
-      });
-
-      return scored
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 3)
-        .map(m => {
-          const { score, ...meal } = m;
-          return meal;
-        });
-    }
-
-    function calculateTotals(meals) {
-      return meals.reduce((acc, meal) => ({
-        calories: acc.calories + (meal.calories || 0),
-        protein: acc.protein + (meal.protein || 0),
-        carbs: acc.carbs + (meal.carbs || 0),
-        fat: acc.fat + (meal.fat || 0)
-      }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
-    }
-
-    // MAIN APP
-    function App() {
-      const today = new Date().toISOString().split('T')[0];
-
-      const [meals, setMeals] = React.useState(() => {
-        const stored = localStorage.getItem(`meals-${today}`);
-        return stored ? JSON.parse(stored) : [];
-      });
-
-      const [metrics, setMetrics] = React.useState(() => {
-        const stored = localStorage.getItem(`metrics-${today}`);
-        return stored ? JSON.parse(stored) : {
-          energy: 5,
-          mood: 5,
-          sleep: 7,
-          cigarettes: 0,
-          bikeCompleted: false,
-          bikeDuration: 0
-        };
-      });
-
-      const [showMealModal, setShowMealModal] = React.useState(false);
-      const [mealType, setMealType] = React.useState('lunch');
-      const [selectedRestaurant, setSelectedRestaurant] = React.useState('');
-      const [selectedMeal, setSelectedMeal] = React.useState('');
-      const [portion, setPortion] = React.useState('standard');
-      const [notes, setNotes] = React.useState('');
-
-      // Custom meal fields
-      const [customMealName, setCustomMealName] = React.useState('');
-      const [customSearchQuery, setCustomSearchQuery] = React.useState('');
-      const [searchResults, setSearchResults] = React.useState([]);
-      const [isSearching, setIsSearching] = React.useState(false);
-      const [customCalories, setCustomCalories] = React.useState('');
-      const [customProtein, setCustomProtein] = React.useState('');
-      const [customCarbs, setCustomCarbs] = React.useState('');
-      const [customFat, setCustomFat] = React.useState('');
-      const [formError, setFormError] = React.useState('');
-      const [searchTimeout, setSearchTimeout] = React.useState(null);
-      const [searchDone, setSearchDone] = React.useState(false);
-      const [useManualEntry, setUseManualEntry] = React.useState(false);
-
-      React.useEffect(() => {
-        localStorage.setItem(`meals-${today}`, JSON.stringify(meals));
-      }, [meals, today]);
-
-      React.useEffect(() => {
-        localStorage.setItem(`metrics-${today}`, JSON.stringify(metrics));
-      }, [metrics, today]);
-
-      const isCustomMeal = selectedRestaurant === 'Home Cooked / Publix';
-      const totals = calculateTotals(meals);
-      const recommendations = generateRecommendations(meals);
-
-      const handleSearchMeal = (query) => {
-        setCustomSearchQuery(query);
-        setUseManualEntry(false); // Reset manual entry flag when searching
-
-        // Clear previous timeout
-        if (searchTimeout) clearTimeout(searchTimeout);
-
-        if (query.length < 2) {
-          setSearchResults([]);
-          setSearchDone(false);
-          return;
-        }
-
-        setSearchDone(false);
-        setIsSearching(true);
-
-        // Debounce: wait 400ms after user stops typing
-        const timeout = setTimeout(async () => {
-          try {
-            const results = await searchNutritionix(query);
-            setSearchResults(results.slice(0, 8)); // Show 8 results
-            setSearchDone(true); // Mark search as complete
-            setIsSearching(false);
-          } catch (error) {
-            console.error('Search error:', error);
-            setSearchResults([]);
-            setSearchDone(true);
-            setIsSearching(false);
-          }
-        }, 400);
-
-        setSearchTimeout(timeout);
-      };
-
-      const handleSelectSearchResult = (result, e) => {
-        if (e) {
-          e.stopPropagation();
-        }
-        setCustomMealName(result.food_name);
-        setCustomCalories(Math.round(result.nf_calories).toString());
-        setCustomProtein(Math.round(result.nf_protein).toString());
-        setCustomCarbs(Math.round(result.nf_total_carbohydrate).toString());
-        setCustomFat(Math.round(result.nf_total_fat).toString());
-        setSearchResults([]);
-        setCustomSearchQuery('');
-      };
-
-      const handleAddMeal = () => {
-        setFormError('');
-
-        if (isCustomMeal) {
-          if (!customMealName.trim()) {
-            setFormError('Please select or enter a meal name');
-            return;
-          }
-          if (!customCalories || !customProtein || !customCarbs || !customFat) {
-            setFormError('Please search for and select a meal to auto-fill nutrition');
-            return;
-          }
-
-          const newMeal = {
-            id: Date.now(),
-            mealType,
-            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-            restaurant: 'Home Cooked / Publix',
-            name: customMealName,
-            calories: parseInt(customCalories),
-            protein: parseInt(customProtein),
-            carbs: parseInt(customCarbs),
-            fat: parseInt(customFat),
-            notes
-          };
-
-          setMeals([...meals, newMeal]);
-          setShowMealModal(false);
-          setCustomMealName('');
-          setCustomSearchQuery('');
-          setCustomCalories('');
-          setCustomProtein('');
-          setCustomCarbs('');
-          setCustomFat('');
-          setNotes('');
-        } else {
-          if (!selectedRestaurant) {
-            setFormError('Please select a restaurant');
-            return;
-          }
-          if (!selectedMeal) {
-            setFormError('Please select a meal');
-            return;
-          }
-
-          const restaurant = RESTAURANTS[selectedRestaurant];
-          const meal = restaurant.meals.find(m => m.name === selectedMeal);
-
-          if (!meal) {
-            setFormError('Meal not found');
-            return;
-          }
-
-          const multiplier = portion === 'smaller' ? 0.75 : portion === 'larger' ? 1.25 : 1;
-
-          const newMeal = {
-            id: Date.now(),
-            mealType,
-            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-            restaurant: selectedRestaurant,
-            name: selectedMeal,
-            calories: Math.round(meal.calories * multiplier),
-            protein: Math.round(meal.protein * multiplier),
-            carbs: Math.round(meal.carbs * multiplier),
-            fat: Math.round(meal.fat * multiplier),
-            notes
-          };
-
-          setMeals([...meals, newMeal]);
-          setShowMealModal(false);
-          setSelectedRestaurant('');
-          setSelectedMeal('');
-          setPortion('standard');
-          setNotes('');
-        }
-      };
-
-      const handleDeleteMeal = (id) => {
-        setMeals(meals.filter(m => m.id !== id));
-      };
-
-      const getProgressPercent = (value, target) => {
-        return Math.min((value / target) * 100, 100);
-      };
-
-      return (
-        <div className="app">
-          <header className="header">
-            <h1>🍽️ FLPP Daily Log</h1>
-            <p className="subtitle">Fulmer Longevity & Performance Project</p>
-          </header>
-
-          <main className="container">
-            {/* PROGRESS METRICS */}
-            <div className="progress-grid">
-              <div className="metric-card">
-                <span className="metric-label">Calories</span>
-                <span className="metric-value">{totals.calories}</span>
-                <span className="metric-target">/{DAILY_TARGETS.calories}</span>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${getProgressPercent(totals.calories, DAILY_TARGETS.calories)}%` }}></div>
-                </div>
-              </div>
-
-              <div className="metric-card">
-                <span className="metric-label">Protein</span>
-                <span className="metric-value">{totals.protein}g</span>
-                <span className="metric-target">/{DAILY_TARGETS.protein}g</span>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${getProgressPercent(totals.protein, DAILY_TARGETS.protein)}%` }}></div>
-                </div>
-              </div>
-
-              <div className="metric-card">
-                <span className="metric-label">Carbs</span>
-                <span className="metric-value">{totals.carbs}g</span>
-                <span className="metric-target">/{DAILY_TARGETS.carbs}g</span>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${getProgressPercent(totals.carbs, DAILY_TARGETS.carbs)}%` }}></div>
-                </div>
-              </div>
-
-              <div className="metric-card">
-                <span className="metric-label">Fat</span>
-                <span className="metric-value">{totals.fat}g</span>
-                <span className="metric-target">/{DAILY_TARGETS.fat}g</span>
-                <div className="progress-bar">
-                  <div className="progress-fill" style={{ width: `${getProgressPercent(totals.fat, DAILY_TARGETS.fat)}%` }}></div>
-                </div>
-              </div>
-            </div>
-
-            {/* QUICK LOG BUTTONS */}
-            <div className="quick-buttons">
-              <button className="quick-btn" onClick={() => { setMealType('breakfast'); setShowMealModal(true); setFormError(''); }}>🌅 Breakfast</button>
-              <button className="quick-btn" onClick={() => { setMealType('lunch'); setShowMealModal(true); setFormError(''); }}>🥗 Lunch</button>
-              <button className="quick-btn" onClick={() => { setMealType('dinner'); setShowMealModal(true); setFormError(''); }}>🍽️ Dinner</button>
-              <button className="quick-btn" onClick={() => { setMealType('snack'); setShowMealModal(true); setFormError(''); }}>🍎 Snack</button>
-              <button className="quick-btn" onClick={() => { setMealType('bike'); setShowMealModal(true); setFormError(''); }}>🚴 Post-Ride</button>
-              <button className="quick-btn" onClick={() => { setMealType('custom'); setSelectedRestaurant('Home Cooked / Publix'); setShowMealModal(true); setFormError(''); }}>🏠 Home Cooked</button>
-            </div>
-
-            {/* MEALS LIST */}
-            <div className="meals-section">
-              <h2>📋 Today's Meals</h2>
-              {meals.length === 0 ? (
-                <div className="meal-item empty">No meals logged yet. Start tracking!</div>
-              ) : (
-                meals.map(meal => (
-                  <div key={meal.id} className="meal-item">
-                    <div className="meal-info">
-                      <div className="meal-time">{meal.time}</div>
-                      <div className="meal-name">{meal.restaurant} - {meal.name}</div>
-                      <div className="meal-nutrition">
-                        {meal.calories}cal | {meal.protein}g protein | {meal.carbs}g carbs | {meal.fat}g fat
-                      </div>
-                    </div>
-                    <div className="meal-actions">
-                      <button className="btn-small delete" onClick={() => handleDeleteMeal(meal.id)}>✕</button>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {/* SMART RECOMMENDATIONS */}
-            {recommendations.length > 0 && (
-              <div className="recommendation-section">
-                <h3>💡 Smart Recommendations</h3>
-                <div className="recommendation-reason">
-                  You need {DAILY_TARGETS.protein - totals.protein}g more protein. Refuel wisely!
-                </div>
-                <div className="recommendation-cards">
-                  {recommendations.map((rec, idx) => (
-                    <div key={idx} className="rec-card">
-                      <div className="rec-info">
-                        <div className="rec-name">{rec.restaurant}</div>
-                        <div className="rec-nutrition">{rec.name} • {rec.calories}cal • {rec.protein}g protein</div>
-                      </div>
-                      <button className="btn-log" onClick={() => {
-                        setSelectedRestaurant(rec.restaurant);
-                        setSelectedMeal(rec.name);
-                        setMealType('lunch');
-                        setShowMealModal(true);
-                        setFormError('');
-                      }}>Log</button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* HEALTH METRICS */}
-            <div className="metrics-section">
-              <h3>❤️ Health Metrics</h3>
-              <div className="metric-input-group">
-                <div className="metric-input">
-                  <label>Energy Level</label>
-                  <select value={metrics.energy} onChange={(e) => setMetrics({...metrics, energy: parseInt(e.target.value)})}>
-                    {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                  </select>
-                </div>
-
-                <div className="metric-input">
-                  <label>Mood</label>
-                  <select value={metrics.mood} onChange={(e) => setMetrics({...metrics, mood: parseInt(e.target.value)})}>
-                    {[1,2,3,4,5,6,7,8,9,10].map(n => <option key={n} value={n}>{n}</option>)}
-                  </select>
-                </div>
-
-                <div className="metric-input">
-                  <label>Sleep Hours</label>
-                  <input type="number" step="0.5" min="0" max="12" value={metrics.sleep} onChange={(e) => setMetrics({...metrics, sleep: parseFloat(e.target.value)})} />
-                </div>
-
-                <div className="metric-input">
-                  <label>Cigarettes</label>
-                  <input type="number" min="0" value={metrics.cigarettes} onChange={(e) => setMetrics({...metrics, cigarettes: parseInt(e.target.value)})} />
-                </div>
-
-                <div className="metric-input">
-                  <label>Zone 2 Bike</label>
-                  <input type="number" min="0" max="300" value={metrics.bikeDuration} placeholder="mins" onChange={(e) => setMetrics({...metrics, bikeDuration: parseInt(e.target.value), bikeCompleted: parseInt(e.target.value) > 0})} />
-                </div>
-              </div>
-            </div>
-          </main>
-
-          {/* MEAL LOGGING MODAL */}
-          {showMealModal && (
-            <div className="modal-overlay" onClick={() => setShowMealModal(false)}>
-              <div className="modal" onClick={(e) => e.stopPropagation()}>
-                <div className="modal-header">
-                  <h2>📝 Log Meal</h2>
-                  <button className="btn-close" onClick={() => setShowMealModal(false)}>✕</button>
-                </div>
-
-                {!isCustomMeal ? (
-                  <>
-                    <div className="form-group">
-                      <label>Restaurant</label>
-                      <select value={selectedRestaurant} onChange={(e) => { setSelectedRestaurant(e.target.value); setSelectedMeal(''); setFormError(''); }}>
-                        <option value="">Choose a restaurant...</option>
-                        {Object.keys(RESTAURANTS).map(r => r !== 'Home Cooked / Publix' && <option key={r} value={r}>{r}</option>)}
-                        <option value="Home Cooked / Publix">Home Cooked / Publix</option>
-                      </select>
-                    </div>
-
-                    {selectedRestaurant && selectedRestaurant !== 'Home Cooked / Publix' && (
-                      <div className="form-group">
-                        <label>Meal</label>
-                        <select value={selectedMeal} onChange={(e) => { setSelectedMeal(e.target.value); setFormError(''); }}>
-                          <option value="">Choose a meal...</option>
-                          {RESTAURANTS[selectedRestaurant]?.meals.map(m => (
-                            <option key={m.name} value={m.name}>{m.name}</option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
-
-                    {selectedMeal && selectedRestaurant !== 'Home Cooked / Publix' && (
-                      <>
-                        <div className="form-group">
-                          <label>Portion Size</label>
-                          <div style={{ display: 'flex', gap: '8px' }}>
-                            <button style={{ flex: 1, padding: '10px', border: portion === 'smaller' ? '2px solid #667eea' : '2px solid #ddd', background: portion === 'smaller' ? '#f0f4ff' : 'white', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }} onClick={() => setPortion('smaller')}>Smaller</button>
-                            <button style={{ flex: 1, padding: '10px', border: portion === 'standard' ? '2px solid #667eea' : '2px solid #ddd', background: portion === 'standard' ? '#f0f4ff' : 'white', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }} onClick={() => setPortion('standard')}>Standard</button>
-                            <button style={{ flex: 1, padding: '10px', border: portion === 'larger' ? '2px solid #667eea' : '2px solid #ddd', background: portion === 'larger' ? '#f0f4ff' : 'white', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }} onClick={() => setPortion('larger')}>Larger</button>
-                          </div>
-                        </div>
-
-                        {(() => {
-                          const restaurant = RESTAURANTS[selectedRestaurant];
-                          const meal = restaurant.meals.find(m => m.name === selectedMeal);
-                          const multiplier = portion === 'smaller' ? 0.75 : portion === 'larger' ? 1.25 : 1;
-                          return (
-                            <div className="nutrition-preview">
-                              {Math.round(meal.calories * multiplier)} cal | {Math.round(meal.protein * multiplier)}g protein | {Math.round(meal.carbs * multiplier)}g carbs | {Math.round(meal.fat * multiplier)}g fat
-                            </div>
-                          );
-                        })()}
-                      </>
-                    )}
-
-                    <div className="form-group">
-                      <label>Notes (optional)</label>
-                      <input type="text" placeholder="e.g., no oil, extra protein..." value={notes} onChange={(e) => { setNotes(e.target.value); setFormError(''); }} />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div className="form-group">
-                      <label>🔍 Search Publix Ingredients</label>
-                      <input
-                        type="text"
-                        placeholder="e.g., Egg & Cheese Sandwich, Grilled Chicken..."
-                        value={customSearchQuery}
-                        onChange={(e) => handleSearchMeal(e.target.value)}
-                      />
-                      {isSearching && (
-                        <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: '#667eea' }}>
-                          <div className="loading-spinner"></div>
-                          Searching Nutritionix...
-                        </div>
-                      )}
-                    </div>
-
-                    {searchResults.length > 0 && (
-                      <div className="search-results" onClick={(e) => e.stopPropagation()}>
-                        {searchResults.map((result, idx) => (
-                          <div
-                            key={idx}
-                            className="search-result-item"
-                            onClick={(e) => handleSelectSearchResult(result, e)}
-                          >
-                            <div className="result-name">{result.food_name}</div>
-                            <div className="result-nutrition">
-                              {Math.round(result.nf_calories)} cal | {Math.round(result.nf_protein)}g protein | {Math.round(result.nf_total_carbohydrate)}g carbs | {Math.round(result.nf_total_fat)}g fat
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {searchDone && searchResults.length === 0 && !customMealName && (
-                      <div style={{ background: '#fff3cd', border: '1px solid #ffc107', borderRadius: '8px', padding: '12px', marginBottom: '16px', fontSize: '13px', color: '#856404' }}>
-                        <div style={{ fontWeight: 600, marginBottom: '8px' }}>❌ No results found</div>
-                        <div style={{ marginBottom: '12px' }}>Not finding your meal? Enter nutrition manually:</div>
-                        <button
-                          onClick={() => setUseManualEntry(true)}
-                          style={{ background: '#ffc107', border: 'none', color: '#333', padding: '10px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', width: '100%' }}
-                        >
-                          📝 Enter Nutrition Manually
-                        </button>
-                      </div>
-                    )}
-
-                    {useManualEntry && (
-                      <>
-                        <div className="form-group">
-                          <label>Meal Name *</label>
-                          <input type="text" placeholder="e.g., Stouffers French Bread Pizza" value={customMealName} onChange={(e) => setCustomMealName(e.target.value)} />
-                        </div>
-
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                          <div className="form-group">
-                            <label>Calories *</label>
-                            <input type="number" placeholder="300" value={customCalories} onChange={(e) => setCustomCalories(e.target.value)} />
-                          </div>
-                          <div className="form-group">
-                            <label>Protein (g) *</label>
-                            <input type="number" placeholder="20" value={customProtein} onChange={(e) => setCustomProtein(e.target.value)} />
-                          </div>
-                          <div className="form-group">
-                            <label>Carbs (g) *</label>
-                            <input type="number" placeholder="40" value={customCarbs} onChange={(e) => setCustomCarbs(e.target.value)} />
-                          </div>
-                          <div className="form-group">
-                            <label>Fat (g) *</label>
-                            <input type="number" placeholder="10" value={customFat} onChange={(e) => setCustomFat(e.target.value)} />
-                          </div>
-                        </div>
-
-                        <div className="nutrition-preview">
-                          {customCalories || 0} cal | {customProtein || 0}g protein | {customCarbs || 0}g carbs | {customFat || 0}g fat
-                        </div>
-
-                        <div className="form-group">
-                          <label>Notes (optional)</label>
-                          <input type="text" placeholder="e.g., Stouffers box has 2, I ate 1. From Publix..." value={notes} onChange={(e) => setNotes(e.target.value)} />
-                        </div>
-                      </>
-                    )}
-
-                    {customMealName && !useManualEntry && (
-                      <>
-                        <div className="form-group">
-                          <label>Meal Name</label>
-                          <input type="text" value={customMealName} onChange={(e) => setCustomMealName(e.target.value)} />
-                        </div>
-
-                        <div className="nutrition-preview">
-                          {customCalories || 0} cal | {customProtein || 0}g protein | {customCarbs || 0}g carbs | {customFat || 0}g fat
-                        </div>
-
-                        <div className="form-group">
-                          <label>Notes (optional)</label>
-                          <input type="text" placeholder="e.g., From Publix, homemade..." value={notes} onChange={(e) => { setNotes(e.target.value); setFormError(''); }} />
-                        </div>
-                      </>
-                    )}
-
-                    {!customMealName && (
-                      <div style={{ color: '#999', fontSize: '13px', padding: '12px', background: '#f9fafb', borderRadius: '8px', textAlign: 'center' }}>
-                        Search above to find a meal and auto-fill nutrition
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {formError && (
-                  <div className="error-message">
-                    ⚠️ {formError}
-                  </div>
-                )}
-
-                <div className="modal-buttons">
-                  <button className="btn-secondary" onClick={() => setShowMealModal(false)}>Cancel</button>
-                  <button className="btn-primary" onClick={handleAddMeal}>Save Meal</button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <footer className="footer">
-            <p>Phase 2.1 Live ✓ | Auto Nutrition Lookup | Nutritionix Search | Mobile-First</p>
-          </footer>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ FLPP Meal Logger</h1>
+            <p>Smart nutrition tracking with instant search</p>
+            <div class="date-display" id="dateDisplay"></div>
         </div>
-      );
-    }
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
-  </script>
+        <div class="metrics">
+            <div class="metric-card">
+                <div class="metric-label">Calories</div>
+                <div class="metric-value" id="calorieValue">0</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="calorieProgress" style="width: 0%"></div>
+                </div>
+                <div class="metric-label" style="margin-top: 4px; font-size: 11px; color: #999;" id="calorieTarget">Target: 2,500</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Protein</div>
+                <div class="metric-value" id="proteinValue">0g</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="proteinProgress" style="width: 0%"></div>
+                </div>
+                <div class="metric-label" style="margin-top: 4px; font-size: 11px; color: #999;" id="proteinTarget">Target: 170g</div>
+            </div>
+        </div>
+
+        <div class="search-section">
+            <input type="text" class="search-input" id="foodSearch" placeholder="🔍 Search foods (e.g., 'chicken', 'stouffers', 'egg')">
+            <div class="search-results" id="searchResults" style="display: none;"></div>
+        </div>
+
+        <div class="quick-buttons" id="quickButtons"></div>
+
+        <div class="meals-section">
+            <div class="section-title">Today's Meals</div>
+            <div id="mealsList" style="margin-bottom: 20px;"></div>
+            <button class="quick-btn" style="width: 100%; grid-column: 1/-1;" onclick="openCustomMealModal()">+ Add Custom Meal</button>
+        </div>
+    </div>
+
+    <div class="modal" id="customMealModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('customMealModal')">✕</button>
+            <h2 style="margin-bottom: 20px;">Add Custom Meal</h2>
+            <div class="form-group"><label>Meal Name</label><input type="text" id="customMealName" placeholder="e.g., Egg & Cheese Sandwich"></div>
+            <div class="form-group"><label>Calories</label><input type="number" id="customCalories" placeholder="e.g., 350"></div>
+            <div class="form-group"><label>Protein (g)</label><input type="number" id="customProtein" placeholder="e.g., 18"></div>
+            <div class="form-group"><label>Carbs (g)</label><input type="number" id="customCarbs" placeholder="e.g., 35"></div>
+            <div class="form-group"><label>Fat (g)</label><input type="number" id="customFat" placeholder="e.g., 12"></div>
+            <div class="form-group"><label>Notes (optional)</label><input type="text" id="customNotes" placeholder="e.g., homemade from Publix ingredients"></div>
+            <div class="form-group"><button onclick="saveCustomMeal()">Log Meal</button><div class="error-message" id="customMealError"></div></div>
+        </div>
+    </div>
+
+    <div class="modal" id="servingSizeModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('servingSizeModal')">✕</button>
+            <h2 style="margin-bottom: 20px;" id="servingSizeTitle">Select Serving Size</h2>
+            <div id="servingSizeOptions"></div>
+            <div class="form-group" style="margin-top: 20px;"><button onclick="confirmServingSize()">Confirm</button></div>
+        </div>
+    </div>
+
+    <script>
+        const FOOD_DATABASE = [
+            { name: "Bonos BBQ - Pulled Pork Sandwich", calories: 340, protein: 30, carbs: 37, fat: 9, category: "restaurant" },
+            { name: "Bonos BBQ - BBQ Salad with Pork", calories: 530, protein: 53, carbs: 17, fat: 28, category: "restaurant" },
+            { name: "Bonos BBQ - Pork Hawg", calories: 520, protein: 45, carbs: 55, fat: 14, category: "restaurant" },
+            { name: "LongHorn - Filet 6oz", calories: 330, protein: 37, carbs: 2, fat: 18, category: "restaurant" },
+            { name: "LongHorn - Filet 9oz with Sides", calories: 650, protein: 52, carbs: 12, fat: 28, category: "restaurant" },
+            { name: "LongHorn - Grilled Chicken", calories: 280, protein: 35, carbs: 5, fat: 12, category: "restaurant" },
+            { name: "Panera - Turkey Sandwich", calories: 900, protein: 43, carbs: 95, fat: 32, category: "restaurant" },
+            { name: "Panera - Salad with Chicken", calories: 520, protein: 40, carbs: 35, fat: 20, category: "restaurant" },
+            { name: "Panera - Broccoli Cheddar Soup", calories: 260, protein: 12, carbs: 18, fat: 14, category: "restaurant" },
+            { name: "Chick-fil-A - Chicken Sandwich Combo", calories: 460, protein: 28, carbs: 41, fat: 19, category: "restaurant" },
+            { name: "Chick-fil-A - Market Salad", calories: 380, protein: 35, carbs: 15, fat: 18, category: "restaurant" },
+            { name: "Chick-fil-A - Grilled Chicken Club", calories: 390, protein: 38, carbs: 25, fat: 16, category: "restaurant" },
+            { name: "Olive Garden - Grilled Chicken + Toast", calories: 350, protein: 25, carbs: 20, fat: 14, category: "restaurant" },
+            { name: "Olive Garden - Chicken Giardino", calories: 530, protein: 28, carbs: 35, fat: 22, category: "restaurant" },
+            { name: "Darumas - Hibachi Chicken", calories: 750, protein: 45, carbs: 65, fat: 22, category: "restaurant" },
+            { name: "Darumas - Hibachi Beef", calories: 800, protein: 48, carbs: 68, fat: 26, category: "restaurant" },
+            { name: "Salsas - Carne Asada Tacos (2)", calories: 400, protein: 28, carbs: 35, fat: 18, category: "restaurant" },
+            { name: "Salsas - Carne Asada Fajitas", calories: 520, protein: 38, carbs: 45, fat: 20, category: "restaurant" },
+            { name: "Rice Bowl - Pho Beef", calories: 450, protein: 32, carbs: 38, fat: 12, category: "restaurant" },
+            { name: "Rice Bowl - Pho Chicken", calories: 380, protein: 28, carbs: 35, fat: 10, category: "restaurant" },
+            { name: "Arby's - Classic Roast Beef", calories: 360, protein: 23, carbs: 37, fat: 14, category: "restaurant" },
+            { name: "Arby's - Beef N Cheddar", calories: 450, protein: 23, carbs: 45, fat: 20, category: "restaurant" },
+            { name: "Miller's - Osso Buco", calories: 1380, protein: 100, carbs: 120, fat: 65, category: "restaurant" },
+            { name: "Bagels R Us - Egg & Cheese Bagel", calories: 475, protein: 23, carbs: 48, fat: 18, category: "restaurant" },
+            { name: "Tropical Smoothie - Quesadilla", calories: 540, protein: 31, carbs: 39, fat: 27, category: "restaurant" },
+            { name: "McDonald's - Double Cheeseburger", calories: 440, protein: 25, carbs: 35, fat: 20, category: "restaurant" },
+            { name: "Tijuana Flats - Burrito", calories: 680, protein: 32, carbs: 85, fat: 28, category: "restaurant" },
+            { name: "Grilled Chicken Breast (3.5 oz)", calories: 165, protein: 31, carbs: 0, fat: 3.6, category: "protein" },
+            { name: "Grilled Chicken Breast (6 oz)", calories: 280, protein: 53, carbs: 0, fat: 6, category: "protein" },
+            { name: "Ground Beef 93/7 (3.5 oz)", calories: 170, protein: 23, carbs: 0, fat: 8, category: "protein" },
+            { name: "Ground Beef 80/20 (3.5 oz)", calories: 290, protein: 20, carbs: 0, fat: 23, category: "protein" },
+            { name: "Salmon (3.5 oz)", calories: 280, protein: 25, carbs: 0, fat: 20, category: "protein" },
+            { name: "Tilapia (3.5 oz)", calories: 130, protein: 26, carbs: 0, fat: 2.7, category: "protein" },
+            { name: "Pork Tenderloin (3.5 oz)", calories: 185, protein: 28, carbs: 0, fat: 8, category: "protein" },
+            { name: "Turkey Breast (3.5 oz)", calories: 135, protein: 29, carbs: 0, fat: 1.5, category: "protein" },
+            { name: "Eggs - Scrambled (2)", calories: 155, protein: 13, carbs: 1, fat: 11, category: "protein" },
+            { name: "Eggs - Fried (2)", calories: 185, protein: 13, carbs: 1, fat: 14, category: "protein" },
+            { name: "Egg Whites (3)", calories: 51, protein: 11, carbs: 0.6, fat: 0.2, category: "protein" },
+            { name: "Greek Yogurt (1 cup)", calories: 140, protein: 20, carbs: 7, fat: 4, category: "protein" },
+            { name: "Cottage Cheese (1 cup)", calories: 206, protein: 28, carbs: 8, fat: 9, category: "protein" },
+            { name: "Tuna Canned (3 oz)", calories: 120, protein: 26, carbs: 0, fat: 1, category: "protein" },
+            { name: "Lean Steak (4 oz)", calories: 280, protein: 35, carbs: 0, fat: 14, category: "protein" },
+            { name: "Brown Rice (1 cup cooked)", calories: 215, protein: 5, carbs: 45, fat: 2, category: "carbs" },
+            { name: "White Rice (1 cup cooked)", calories: 205, protein: 4, carbs: 45, fat: 0.3, category: "carbs" },
+            { name: "Pasta (1 cup cooked)", calories: 221, protein: 8, carbs: 43, fat: 1.3, category: "carbs" },
+            { name: "Oatmeal (1 cup cooked)", calories: 150, protein: 5, carbs: 27, fat: 3, category: "carbs" },
+            { name: "Whole Wheat Bread (1 slice)", calories: 80, protein: 4, carbs: 14, fat: 1, category: "carbs" },
+            { name: "White Bread (1 slice)", calories: 80, protein: 2, carbs: 15, fat: 1, category: "carbs" },
+            { name: "Sweet Potato (1 medium baked)", calories: 103, protein: 2, carbs: 24, fat: 0.1, category: "carbs" },
+            { name: "Regular Potato (1 medium baked)", calories: 165, protein: 4, carbs: 37, fat: 0.1, category: "carbs" },
+            { name: "Bagel (plain)", calories: 260, protein: 10, carbs: 51, fat: 1.5, category: "carbs" },
+            { name: "Cereal (1 cup Frosted Flakes)", calories: 150, protein: 3, carbs: 36, fat: 0.3, category: "carbs" },
+            { name: "Cheese - Cheddar (1 oz)", calories: 113, protein: 7, carbs: 0.4, fat: 9, category: "dairy" },
+            { name: "Cheese - Mozzarella (1 oz)", calories: 80, protein: 7, carbs: 1, fat: 6, category: "dairy" },
+            { name: "Milk - 2% (1 cup)", calories: 122, protein: 8, carbs: 12, fat: 5, category: "dairy" },
+            { name: "Milk - Whole (1 cup)", calories: 150, protein: 8, carbs: 12, fat: 8, category: "dairy" },
+            { name: "Yogurt Plain (1 cup)", calories: 154, protein: 28, carbs: 11, fat: 3, category: "dairy" },
+            { name: "Butter (1 tbsp)", calories: 102, protein: 0.1, carbs: 0, fat: 11.5, category: "dairy" },
+            { name: "Broccoli (1 cup raw)", calories: 31, protein: 3, carbs: 6, fat: 0.4, category: "vegetable" },
+            { name: "Spinach (1 cup raw)", calories: 7, protein: 1, carbs: 1, fat: 0.1, category: "vegetable" },
+            { name: "Carrots (1 medium raw)", calories: 25, protein: 0.6, carbs: 6, fat: 0.1, category: "vegetable" },
+            { name: "Bell Pepper (1 medium)", calories: 37, protein: 1, carbs: 9, fat: 0.3, category: "vegetable" },
+            { name: "Tomato (1 medium)", calories: 22, protein: 1, carbs: 5, fat: 0.2, category: "vegetable" },
+            { name: "Stouffers French Bread Pizza (1 pizza)", calories: 350, protein: 15, carbs: 40, fat: 16, servingNote: "Half of box - ask portions", category: "frozen" },
+            { name: "Birds Eye Frozen Broccoli (1 cup)", calories: 35, protein: 3.5, carbs: 6, fat: 0.4, category: "frozen" },
+            { name: "Lean Cuisine Meal (typical)", calories: 300, protein: 25, carbs: 35, fat: 8, category: "frozen" },
+            { name: "Chicken Breast Pub Subs - Sliced (3 oz)", calories: 120, protein: 20, carbs: 2, fat: 4, category: "deli" },
+            { name: "Turkey Breast Sliced (3 oz)", calories: 90, protein: 18, carbs: 1, fat: 1.5, category: "deli" },
+            { name: "Rotisserie Chicken - 3.5 oz", calories: 220, protein: 27, carbs: 0, fat: 12, category: "prepared" },
+            { name: "Apple (1 medium)", calories: 95, protein: 0.5, carbs: 25, fat: 0.3, category: "fruit" },
+            { name: "Banana (1 medium)", calories: 105, protein: 1, carbs: 27, fat: 0.3, category: "fruit" },
+            { name: "Orange (1 medium)", calories: 62, protein: 1, carbs: 16, fat: 0.3, category: "fruit" },
+            { name: "Blueberries (1 cup)", calories: 85, protein: 1, carbs: 21, fat: 0.5, category: "fruit" },
+            { name: "Strawberries (1 cup)", calories: 49, protein: 1, carbs: 12, fat: 0.5, category: "fruit" },
+            { name: "Almonds (1 oz / 23 nuts)", calories: 164, protein: 6, carbs: 6, fat: 14, category: "snack" },
+            { name: "Peanut Butter (2 tbsp)", calories: 188, protein: 8, carbs: 7, fat: 16, category: "snack" },
+            { name: "Protein Shake (25g powder)", calories: 120, protein: 25, carbs: 2, fat: 2, category: "snack" },
+            { name: "Protein Bar (typical)", calories: 250, protein: 20, carbs: 25, fat: 10, category: "snack" },
+            { name: "Olive Oil (1 tbsp)", calories: 120, protein: 0, carbs: 0, fat: 14, category: "oil" },
+            { name: "Coconut Oil (1 tbsp)", calories: 120, protein: 0, carbs: 0, fat: 14, category: "oil" }
+        ];
+
+        let appState = {
+            meals: [],
+            metrics: { calories: 0, protein: 0, carbs: 0, fat: 0 },
+            searchResults: [],
+            selectedFood: null,
+            selectedServingSize: null,
+            currentDate: new Date().toISOString().split('T')[0],
+            fuseSearch: null
+        };
+
+        function init() {
+            updateDateDisplay();
+            setupFuzzySearch();
+            loadDailyData();
+            renderMeals();
+            renderQuickButtons();
+            setupSearch();
+        }
+
+        function setupFuzzySearch() {
+            const options = {
+                keys: ['name'],
+                threshold: 0.4,
+                ignoreLocation: true,
+                minMatchCharLength: 2
+            };
+            appState.fuseSearch = new Fuse(FOOD_DATABASE, options);
+        }
+
+        function updateDateDisplay() {
+            const options = { weekday: 'long', month: 'short', day: 'numeric' };
+            const dateStr = new Date().toLocaleDateString('en-US', options);
+            document.getElementById('dateDisplay').textContent = dateStr;
+        }
+
+        function loadDailyData() {
+            const key = `flpp_meals_${appState.currentDate}`;
+            const saved = localStorage.getItem(key);
+            if (saved) {
+                appState.meals = JSON.parse(saved);
+                calculateMetrics();
+            }
+        }
+
+        function saveDailyData() {
+            const key = `flpp_meals_${appState.currentDate}`;
+            localStorage.setItem(key, JSON.stringify(appState.meals));
+        }
+
+        function calculateMetrics() {
+            appState.metrics = { calories: 0, protein: 0, carbs: 0, fat: 0 };
+            appState.meals.forEach(meal => {
+                appState.metrics.calories += meal.calories || 0;
+                appState.metrics.protein += meal.protein || 0;
+                appState.metrics.carbs += meal.carbs || 0;
+                appState.metrics.fat += meal.fat || 0;
+            });
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const targets = { calories: 2500, protein: 170 };
+            document.getElementById('calorieValue').textContent = Math.round(appState.metrics.calories);
+            document.getElementById('calorieProgress').style.width = Math.min(100, (appState.metrics.calories / targets.calories) * 100) + '%';
+            document.getElementById('proteinValue').textContent = Math.round(appState.metrics.protein) + 'g';
+            document.getElementById('proteinProgress').style.width = Math.min(100, (appState.metrics.protein / targets.protein) * 100) + '%';
+            const calorieRemaining = targets.calories - appState.metrics.calories;
+            const proteinRemaining = targets.protein - appState.metrics.protein;
+            document.getElementById('calorieTarget').textContent = `${calorieRemaining} left`;
+            document.getElementById('proteinTarget').textContent = `${Math.max(0, proteinRemaining)}g left`;
+        }
+
+        function renderQuickButtons() {
+            const container = document.getElementById('quickButtons');
+            container.innerHTML = '';
+            const restaurants = ["Bonos BBQ", "LongHorn", "Panera", "Chick-fil-A", "Olive Garden", "Darumas", "Salsas", "Rice Bowl", "Arby's", "Miller's", "Bagels R Us", "Tropical Smoothie"];
+            restaurants.forEach(rest => {
+                const btn = document.createElement('button');
+                btn.className = 'quick-btn';
+                btn.textContent = rest;
+                btn.onclick = () => searchForRestaurant(rest);
+                container.appendChild(btn);
+            });
+        }
+
+        function searchForRestaurant(restaurantName) {
+            const results = FOOD_DATABASE.filter(f => f.name.toLowerCase().includes(restaurantName.toLowerCase()));
+            displaySearchResults(results);
+        }
+
+        function setupSearch() {
+            const searchInput = document.getElementById('foodSearch');
+            let searchTimeout;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.trim();
+                if (!query) {
+                    document.getElementById('searchResults').style.display = 'none';
+                    return;
+                }
+                searchTimeout = setTimeout(() => { performSearch(query); }, 200);
+            });
+        }
+
+        function performSearch(query) {
+            const results = appState.fuseSearch.search(query).map(result => result.item);
+            appState.searchResults = results.length > 0 ? results : [];
+            displaySearchResults(appState.searchResults);
+        }
+
+        function displaySearchResults(results) {
+            const resultsDiv = document.getElementById('searchResults');
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div class="no-results">No results found. Try "+ Add Custom Meal" to log anyway.</div>';
+                resultsDiv.style.display = 'block';
+                return;
+            }
+            resultsDiv.innerHTML = results.slice(0, 10).map((result, idx) => `
+                <div class="result-item" onclick="selectFood(${FOOD_DATABASE.indexOf(result)})">
+                    <div class="result-name">${result.name}</div>
+                    <div class="result-nutrition">${result.calories} cal | ${result.protein}g protein | ${result.carbs}g carbs | ${result.fat}g fat</div>
+                </div>
+            `).join('');
+            resultsDiv.style.display = 'block';
+        }
+
+        function selectFood(idx) {
+            appState.selectedFood = FOOD_DATABASE[idx];
+            if (appState.selectedFood.servingNote) {
+                showServingSizeModal();
+            } else {
+                logMeal(appState.selectedFood);
+            }
+        }
+
+        function showServingSizeModal() {
+            const food = appState.selectedFood;
+            document.getElementById('servingSizeTitle').textContent = `${food.name}`;
+            const options = document.getElementById('servingSizeOptions');
+            options.innerHTML = `
+                <p style="margin-bottom: 16px; font-size: 14px;">This is a packaged item. How much did you eat?</p>
+                <div class="serving-options">
+                    <div class="serving-option" onclick="selectServing(0.25)">1/4 package</div>
+                    <div class="serving-option" onclick="selectServing(0.5)">1/2 package</div>
+                    <div class="serving-option" onclick="selectServing(0.75)">3/4 package</div>
+                    <div class="serving-option" onclick="selectServing(1)">Full package</div>
+                </div>
+            `;
+            document.getElementById('servingSizeModal').classList.add('active');
+        }
+
+        function selectServing(fraction) {
+            appState.selectedServingSize = fraction;
+            const options = document.querySelectorAll('.serving-option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        function confirmServingSize() {
+            if (!appState.selectedServingSize) {
+                alert('Please select a serving size');
+                return;
+            }
+            const food = { ...appState.selectedFood };
+            food.calories = Math.round(food.calories * appState.selectedServingSize);
+            food.protein = Math.round(food.protein * appState.selectedServingSize);
+            food.carbs = Math.round(food.carbs * appState.selectedServingSize);
+            food.fat = Math.round(food.fat * appState.selectedServingSize);
+            food.notes = `${Math.round(appState.selectedServingSize * 100)}% of package`;
+            logMeal(food);
+            closeModal('servingSizeModal');
+            appState.selectedServingSize = null;
+        }
+
+        function logMeal(meal) {
+            appState.meals.push({
+                ...meal,
+                timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+            calculateMetrics();
+            saveDailyData();
+            renderMeals();
+            document.getElementById('foodSearch').value = '';
+            document.getElementById('searchResults').style.display = 'none';
+        }
+
+        function deleteMeal(idx) {
+            appState.meals.splice(idx, 1);
+            calculateMetrics();
+            saveDailyData();
+            renderMeals();
+        }
+
+        function renderMeals() {
+            const container = document.getElementById('mealsList');
+            if (appState.meals.length === 0) {
+                container.innerHTML = '<p style="color: #999; font-size: 13px; text-align: center; padding: 20px;">No meals logged yet. Search above or click a restaurant!</p>';
+                return;
+            }
+            container.innerHTML = appState.meals.map((meal, idx) => `
+                <div class="meal-card">
+                    <div class="meal-info">
+                        <div class="meal-name">${meal.name}</div>
+                        <div class="meal-nutrition">
+                            ${meal.calories} cal | ${meal.protein}g protein | ${meal.timestamp}
+                            ${meal.notes ? `<br><small>📝 ${meal.notes}</small>` : ''}
+                        </div>
+                    </div>
+                    <button class="meal-delete" onclick="deleteMeal(${idx})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function openCustomMealModal() {
+            document.getElementById('customMealModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function saveCustomMeal() {
+            const name = document.getElementById('customMealName').value.trim();
+            const calories = parseFloat(document.getElementById('customCalories').value) || 0;
+            const protein = parseFloat(document.getElementById('customProtein').value) || 0;
+            const carbs = parseFloat(document.getElementById('customCarbs').value) || 0;
+            const fat = parseFloat(document.getElementById('customFat').value) || 0;
+            const notes = document.getElementById('customNotes').value.trim();
+            if (!name || !calories) {
+                document.getElementById('customMealError').textContent = 'Please enter meal name and calories';
+                return;
+            }
+            logMeal({ name, calories, protein, carbs, fat, notes });
+            document.getElementById('customMealName').value = '';
+            document.getElementById('customCalories').value = '';
+            document.getElementById('customProtein').value = '';
+            document.getElementById('customCarbs').value = '';
+            document.getElementById('customFat').value = '';
+            document.getElementById('customNotes').value = '';
+            document.getElementById('customMealError').textContent = '';
+            closeModal('customMealModal');
+        }
+
+        document.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+
+        init();
+    </script>
 </body>
 </html>
