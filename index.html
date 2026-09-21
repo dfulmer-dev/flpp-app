@@ -772,6 +772,8 @@
       const [customFat, setCustomFat] = React.useState('');
       const [formError, setFormError] = React.useState('');
       const [searchTimeout, setSearchTimeout] = React.useState(null);
+      const [searchDone, setSearchDone] = React.useState(false);
+      const [useManualEntry, setUseManualEntry] = React.useState(false);
 
       React.useEffect(() => {
         localStorage.setItem(`meals-${today}`, JSON.stringify(meals));
@@ -787,21 +789,33 @@
 
       const handleSearchMeal = (query) => {
         setCustomSearchQuery(query);
+        setUseManualEntry(false); // Reset manual entry flag when searching
 
         // Clear previous timeout
         if (searchTimeout) clearTimeout(searchTimeout);
 
         if (query.length < 2) {
           setSearchResults([]);
+          setSearchDone(false);
           return;
         }
 
+        setSearchDone(false);
+        setIsSearching(true);
+
         // Debounce: wait 400ms after user stops typing
         const timeout = setTimeout(async () => {
-          setIsSearching(true);
-          const results = await searchNutritionix(query);
-          setSearchResults(results.slice(0, 8)); // Show 8 results for better visibility
-          setIsSearching(false);
+          try {
+            const results = await searchNutritionix(query);
+            setSearchResults(results.slice(0, 8)); // Show 8 results
+            setSearchDone(true); // Mark search as complete
+            setIsSearching(false);
+          } catch (error) {
+            console.error('Search error:', error);
+            setSearchResults([]);
+            setSearchDone(true);
+            setIsSearching(false);
+          }
         }, 400);
 
         setSearchTimeout(timeout);
@@ -1144,7 +1158,57 @@
                       </div>
                     )}
 
-                    {customMealName && (
+                    {searchDone && searchResults.length === 0 && !customMealName && (
+                      <div style={{ background: '#fff3cd', border: '1px solid #ffc107', borderRadius: '8px', padding: '12px', marginBottom: '16px', fontSize: '13px', color: '#856404' }}>
+                        <div style={{ fontWeight: 600, marginBottom: '8px' }}>❌ No results found</div>
+                        <div style={{ marginBottom: '12px' }}>Not finding your meal? Enter nutrition manually:</div>
+                        <button
+                          onClick={() => setUseManualEntry(true)}
+                          style={{ background: '#ffc107', border: 'none', color: '#333', padding: '10px 16px', borderRadius: '6px', fontSize: '13px', fontWeight: 600, cursor: 'pointer', width: '100%' }}
+                        >
+                          📝 Enter Nutrition Manually
+                        </button>
+                      </div>
+                    )}
+
+                    {useManualEntry && (
+                      <>
+                        <div className="form-group">
+                          <label>Meal Name *</label>
+                          <input type="text" placeholder="e.g., Stouffers French Bread Pizza" value={customMealName} onChange={(e) => setCustomMealName(e.target.value)} />
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                          <div className="form-group">
+                            <label>Calories *</label>
+                            <input type="number" placeholder="300" value={customCalories} onChange={(e) => setCustomCalories(e.target.value)} />
+                          </div>
+                          <div className="form-group">
+                            <label>Protein (g) *</label>
+                            <input type="number" placeholder="20" value={customProtein} onChange={(e) => setCustomProtein(e.target.value)} />
+                          </div>
+                          <div className="form-group">
+                            <label>Carbs (g) *</label>
+                            <input type="number" placeholder="40" value={customCarbs} onChange={(e) => setCustomCarbs(e.target.value)} />
+                          </div>
+                          <div className="form-group">
+                            <label>Fat (g) *</label>
+                            <input type="number" placeholder="10" value={customFat} onChange={(e) => setCustomFat(e.target.value)} />
+                          </div>
+                        </div>
+
+                        <div className="nutrition-preview">
+                          {customCalories || 0} cal | {customProtein || 0}g protein | {customCarbs || 0}g carbs | {customFat || 0}g fat
+                        </div>
+
+                        <div className="form-group">
+                          <label>Notes (optional)</label>
+                          <input type="text" placeholder="e.g., Stouffers box has 2, I ate 1. From Publix..." value={notes} onChange={(e) => setNotes(e.target.value)} />
+                        </div>
+                      </>
+                    )}
+
+                    {customMealName && !useManualEntry && (
                       <>
                         <div className="form-group">
                           <label>Meal Name</label>
