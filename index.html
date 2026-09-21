@@ -53,7 +53,7 @@
       opacity: 0.9;
     }
 
-    /* MAIN CONTAINER - Mobile First */
+    /* MAIN CONTAINER */
     .container {
       flex: 1;
       padding: 16px;
@@ -66,7 +66,7 @@
       padding-bottom: 100px;
     }
 
-    /* PROGRESS CARDS - Mobile Stack */
+    /* PROGRESS CARDS */
     .progress-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -202,7 +202,7 @@
       color: #e74c3c;
     }
 
-    /* SMART RECOMMENDATION */
+    /* RECOMMENDATION */
     .recommendation-section {
       background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
       color: white;
@@ -348,13 +348,6 @@
       font-size: 12px;
     }
 
-    .metric-input input:focus,
-    .metric-input select:focus {
-      outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    }
-
     /* MODAL */
     .modal-overlay {
       position: fixed;
@@ -423,9 +416,8 @@
       margin-bottom: 8px;
     }
 
-    .form-group select,
     .form-group input,
-    .form-group textarea {
+    .form-group select {
       width: 100%;
       padding: 12px;
       border: 1.5px solid #ddd;
@@ -434,12 +426,60 @@
       font-family: inherit;
     }
 
-    .form-group select:focus,
     .form-group input:focus,
-    .form-group textarea:focus {
+    .form-group select:focus {
       outline: none;
       border-color: #667eea;
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-results {
+      background: #f9fafb;
+      border-radius: 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
+
+    .search-result-item {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .search-result-item:hover {
+      background: #f0f4ff;
+    }
+
+    .search-result-item:last-child {
+      border-bottom: none;
+    }
+
+    .result-name {
+      font-weight: 600;
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .result-nutrition {
+      font-size: 11px;
+      color: #666;
+    }
+
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 3px solid #eee;
+      border-top-color: #667eea;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
     }
 
     .error-message {
@@ -449,30 +489,6 @@
       display: flex;
       align-items: center;
       gap: 4px;
-    }
-
-    .portion-selector {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .portion-btn {
-      flex: 1;
-      padding: 12px;
-      border: 2px solid #ddd;
-      background: white;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.2s;
-    }
-
-    .portion-btn.active {
-      border-color: #667eea;
-      background: rgba(102, 126, 234, 0.1);
-      color: #667eea;
     }
 
     .nutrition-preview {
@@ -526,7 +542,6 @@
       background: #ddd;
     }
 
-    /* FOOTER */
     .footer {
       background: #f0f2f5;
       padding: 12px 16px;
@@ -535,11 +550,6 @@
       color: #666;
       margin-top: 20px;
       border-top: 1px solid #ddd;
-    }
-
-    /* UTILITY */
-    .hidden {
-      display: none;
     }
 
     .empty-state {
@@ -554,11 +564,11 @@
   <div id="root"></div>
 
   <script type="text/babel">
-    // RESTAURANT & MEAL DATA
+    // RESTAURANT DATA
     const RESTAURANTS = {
       'Home Cooked / Publix': {
         meals: [
-          { name: 'Enter custom meal details below', custom: true }
+          { name: 'Search Publix ingredients below', custom: true }
         ]
       },
       'Chick-fil-A': {
@@ -570,28 +580,24 @@
       'Olive Garden': {
         meals: [
           { name: 'Grilled Chicken (base)', calories: 130, protein: 20, carbs: 5, fat: 4 },
-          { name: 'Chicken Giardino', calories: 530, protein: 28, carbs: 35, fat: 22 },
-          { name: 'Chicken Margherita', calories: 580, protein: 32, carbs: 38, fat: 24 }
+          { name: 'Chicken Giardino', calories: 530, protein: 28, carbs: 35, fat: 22 }
         ]
       },
       'Panera Bread': {
         meals: [
           { name: 'Turkey Sandwich', calories: 920, protein: 45, carbs: 90, fat: 30 },
-          { name: 'Chicken Sandwich', calories: 950, protein: 50, carbs: 95, fat: 32 },
-          { name: 'Salad with Grilled Chicken', calories: 520, protein: 42, carbs: 28, fat: 18 }
+          { name: 'Chicken Sandwich', calories: 950, protein: 50, carbs: 95, fat: 32 }
         ]
       },
       'LongHorn Steakhouse': {
         meals: [
           { name: "Flo's Filet 6oz", calories: 330, protein: 37, carbs: 2, fat: 18 },
-          { name: "Flo's Filet 9oz", calories: 450, protein: 52, carbs: 3, fat: 25 },
-          { name: 'Filet with Mashed Potatoes & Veggies', calories: 650, protein: 52, carbs: 60, fat: 28 }
+          { name: "Flo's Filet 9oz", calories: 450, protein: 52, carbs: 3, fat: 25 }
         ]
       },
       'Darumas Japanese Steakhouse': {
         meals: [
-          { name: 'Hibachi Steak & Rice & Veggies', calories: 800, protein: 45, carbs: 70, fat: 30 },
-          { name: 'Hibachi Chicken & Rice & Veggies', calories: 750, protein: 48, carbs: 65, fat: 24 }
+          { name: 'Hibachi Steak & Rice & Veggies', calories: 800, protein: 45, carbs: 70, fat: 30 }
         ]
       },
       'Tropical Smoothie Cafe': {
@@ -602,14 +608,12 @@
       'Bonos BBQ': {
         meals: [
           { name: '4oz Pulled Pork Sandwich', calories: 340, protein: 30, carbs: 37, fat: 9 },
-          { name: 'Pork Hawg Sandwich', calories: 520, protein: 45, carbs: 55, fat: 14 },
-          { name: 'BBQ Salad with Pork', calories: 530, protein: 53, carbs: 17, fat: 28 }
+          { name: 'Pork Hawg Sandwich', calories: 520, protein: 45, carbs: 55, fat: 14 }
         ]
       },
       'Arbys': {
         meals: [
-          { name: 'Classic Roast Beef', calories: 360, protein: 23, carbs: 37, fat: 14 },
-          { name: "Beef 'N Cheddar", calories: 450, protein: 23, carbs: 45, fat: 20 }
+          { name: 'Classic Roast Beef', calories: 360, protein: 23, carbs: 37, fat: 14 }
         ]
       },
       'Bagels R Us': {
@@ -639,14 +643,12 @@
       },
       'Rice Bowl': {
         meals: [
-          { name: 'Beef Pho', calories: 475, protein: 30, carbs: 42, fat: 12 },
-          { name: 'Chicken Pho', calories: 400, protein: 28, carbs: 40, fat: 10 }
+          { name: 'Beef Pho', calories: 475, protein: 30, carbs: 42, fat: 12 }
         ]
       },
       'Tijuana Flats': {
         meals: [
-          { name: 'Ground Beef Burrito', calories: 1360, protein: 53, carbs: 95, fat: 62 },
-          { name: 'Refried Beans Burrito', calories: 1210, protein: 33, carbs: 150, fat: 52 }
+          { name: 'Ground Beef Burrito', calories: 1360, protein: 53, carbs: 95, fat: 62 }
         ]
       },
       'Salsas Mexican': {
@@ -656,14 +658,11 @@
       },
       'McDonalds': {
         meals: [
-          { name: 'Big Mac', calories: 580, protein: 25, carbs: 46, fat: 30 },
-          { name: 'Double Cheeseburger', calories: 440, protein: 25, carbs: 35, fat: 20 },
-          { name: 'Double Big Mac', calories: 767, protein: 43, carbs: 45, fat: 46 }
+          { name: 'Big Mac', calories: 580, protein: 25, carbs: 46, fat: 30 }
         ]
       }
     };
 
-    // DAILY TARGETS
     const DAILY_TARGETS = {
       calories: 2500,
       protein: 180,
@@ -671,8 +670,20 @@
       fat: 70
     };
 
-    // RECOMMENDATION ENGINE
-    function generateRecommendations(meals, bikeCompleted) {
+    // NUTRITIONIX SEARCH FUNCTION
+    async function searchNutritionix(query) {
+      try {
+        const response = await fetch(`https://www.nutritionix.com/search/instant?q=${encodeURIComponent(query)}&self=true&mobile=false`);
+        const data = await response.json();
+
+        return data.common || [];
+      } catch (error) {
+        console.error('Search error:', error);
+        return [];
+      }
+    }
+
+    function generateRecommendations(meals) {
       const totals = calculateTotals(meals);
       const remaining = {
         protein: DAILY_TARGETS.protein - totals.protein,
@@ -752,11 +763,13 @@
 
       // Custom meal fields
       const [customMealName, setCustomMealName] = React.useState('');
+      const [customSearchQuery, setCustomSearchQuery] = React.useState('');
+      const [searchResults, setSearchResults] = React.useState([]);
+      const [isSearching, setIsSearching] = React.useState(false);
       const [customCalories, setCustomCalories] = React.useState('');
       const [customProtein, setCustomProtein] = React.useState('');
       const [customCarbs, setCustomCarbs] = React.useState('');
       const [customFat, setCustomFat] = React.useState('');
-
       const [formError, setFormError] = React.useState('');
 
       React.useEffect(() => {
@@ -769,19 +782,41 @@
 
       const isCustomMeal = selectedRestaurant === 'Home Cooked / Publix';
       const totals = calculateTotals(meals);
-      const recommendations = generateRecommendations(meals, metrics.bikeCompleted);
+      const recommendations = generateRecommendations(meals);
+
+      const handleSearchMeal = React.useCallback(async (query) => {
+        setCustomSearchQuery(query);
+        if (query.length < 2) {
+          setSearchResults([]);
+          return;
+        }
+
+        setIsSearching(true);
+        const results = await searchNutritionix(query);
+        setSearchResults(results.slice(0, 5));
+        setIsSearching(false);
+      }, []);
+
+      const handleSelectSearchResult = (result) => {
+        setCustomMealName(result.food_name);
+        setCustomCalories(Math.round(result.nf_calories).toString());
+        setCustomProtein(Math.round(result.nf_protein).toString());
+        setCustomCarbs(Math.round(result.nf_total_carbohydrate).toString());
+        setCustomFat(Math.round(result.nf_total_fat).toString());
+        setSearchResults([]);
+        setCustomSearchQuery('');
+      };
 
       const handleAddMeal = () => {
         setFormError('');
 
         if (isCustomMeal) {
-          // Custom meal validation
           if (!customMealName.trim()) {
-            setFormError('Please enter a meal name');
+            setFormError('Please select or enter a meal name');
             return;
           }
           if (!customCalories || !customProtein || !customCarbs || !customFat) {
-            setFormError('Please fill in all nutrition fields');
+            setFormError('Please search for and select a meal to auto-fill nutrition');
             return;
           }
 
@@ -801,13 +836,13 @@
           setMeals([...meals, newMeal]);
           setShowMealModal(false);
           setCustomMealName('');
+          setCustomSearchQuery('');
           setCustomCalories('');
           setCustomProtein('');
           setCustomCarbs('');
           setCustomFat('');
           setNotes('');
         } else {
-          // Restaurant meal validation
           if (!selectedRestaurant) {
             setFormError('Please select a restaurant');
             return;
@@ -1036,10 +1071,10 @@
                       <>
                         <div className="form-group">
                           <label>Portion Size</label>
-                          <div className="portion-selector">
-                            <button className={`portion-btn ${portion === 'smaller' ? 'active' : ''}`} onClick={() => setPortion('smaller')}>Smaller</button>
-                            <button className={`portion-btn ${portion === 'standard' ? 'active' : ''}`} onClick={() => setPortion('standard')}>Standard</button>
-                            <button className={`portion-btn ${portion === 'larger' ? 'active' : ''}`} onClick={() => setPortion('larger')}>Larger</button>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button style={{ flex: 1, padding: '10px', border: portion === 'smaller' ? '2px solid #667eea' : '2px solid #ddd', background: portion === 'smaller' ? '#f0f4ff' : 'white', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }} onClick={() => setPortion('smaller')}>Smaller</button>
+                            <button style={{ flex: 1, padding: '10px', border: portion === 'standard' ? '2px solid #667eea' : '2px solid #ddd', background: portion === 'standard' ? '#f0f4ff' : 'white', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }} onClick={() => setPortion('standard')}>Standard</button>
+                            <button style={{ flex: 1, padding: '10px', border: portion === 'larger' ? '2px solid #667eea' : '2px solid #ddd', background: portion === 'larger' ? '#f0f4ff' : 'white', borderRadius: '8px', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }} onClick={() => setPortion('larger')}>Larger</button>
                           </div>
                         </div>
 
@@ -1064,40 +1099,61 @@
                 ) : (
                   <>
                     <div className="form-group">
-                      <label>Meal Name *</label>
-                      <input type="text" placeholder="e.g., Egg & Cheese Sandwich" value={customMealName} onChange={(e) => { setCustomMealName(e.target.value); setFormError(''); }} />
+                      <label>🔍 Search Publix Ingredients</label>
+                      <input
+                        type="text"
+                        placeholder="e.g., Egg & Cheese Sandwich, Grilled Chicken..."
+                        value={customSearchQuery}
+                        onChange={(e) => handleSearchMeal(e.target.value)}
+                      />
+                      {isSearching && (
+                        <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px', color: '#667eea' }}>
+                          <div className="loading-spinner"></div>
+                          Searching Nutritionix...
+                        </div>
+                      )}
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                      <div className="form-group">
-                        <label>Calories *</label>
-                        <input type="number" placeholder="400" value={customCalories} onChange={(e) => { setCustomCalories(e.target.value); setFormError(''); }} />
+                    {searchResults.length > 0 && (
+                      <div className="search-results">
+                        {searchResults.map((result, idx) => (
+                          <div
+                            key={idx}
+                            className="search-result-item"
+                            onClick={() => handleSelectSearchResult(result)}
+                          >
+                            <div className="result-name">{result.food_name}</div>
+                            <div className="result-nutrition">
+                              {Math.round(result.nf_calories)} cal | {Math.round(result.nf_protein)}g protein | {Math.round(result.nf_total_carbohydrate)}g carbs | {Math.round(result.nf_total_fat)}g fat
+                            </div>
+                          </div>
+                        ))}
                       </div>
+                    )}
 
-                      <div className="form-group">
-                        <label>Protein (g) *</label>
-                        <input type="number" placeholder="25" value={customProtein} onChange={(e) => { setCustomProtein(e.target.value); setFormError(''); }} />
+                    {customMealName && (
+                      <>
+                        <div className="form-group">
+                          <label>Meal Name</label>
+                          <input type="text" value={customMealName} onChange={(e) => setCustomMealName(e.target.value)} />
+                        </div>
+
+                        <div className="nutrition-preview">
+                          {customCalories || 0} cal | {customProtein || 0}g protein | {customCarbs || 0}g carbs | {customFat || 0}g fat
+                        </div>
+
+                        <div className="form-group">
+                          <label>Notes (optional)</label>
+                          <input type="text" placeholder="e.g., From Publix, homemade..." value={notes} onChange={(e) => { setNotes(e.target.value); setFormError(''); }} />
+                        </div>
+                      </>
+                    )}
+
+                    {!customMealName && (
+                      <div style={{ color: '#999', fontSize: '13px', padding: '12px', background: '#f9fafb', borderRadius: '8px', textAlign: 'center' }}>
+                        Search above to find a meal and auto-fill nutrition
                       </div>
-
-                      <div className="form-group">
-                        <label>Carbs (g) *</label>
-                        <input type="number" placeholder="40" value={customCarbs} onChange={(e) => { setCustomCarbs(e.target.value); setFormError(''); }} />
-                      </div>
-
-                      <div className="form-group">
-                        <label>Fat (g) *</label>
-                        <input type="number" placeholder="15" value={customFat} onChange={(e) => { setCustomFat(e.target.value); setFormError(''); }} />
-                      </div>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Notes (optional)</label>
-                      <input type="text" placeholder="e.g., From Publix, homemade..." value={notes} onChange={(e) => { setNotes(e.target.value); setFormError(''); }} />
-                    </div>
-
-                    <div className="nutrition-preview">
-                      {customCalories || 0} cal | {customProtein || 0}g protein | {customCarbs || 0}g carbs | {customFat || 0}g fat
-                    </div>
+                    )}
                   </>
                 )}
 
@@ -1116,7 +1172,7 @@
           )}
 
           <footer className="footer">
-            <p>Phase 2 Live ✓ | Mobile-First | Real-Time Tracking | Custom Meals Support</p>
+            <p>Phase 2.1 Live ✓ | Auto Nutrition Lookup | Nutritionix Search | Mobile-First</p>
           </footer>
         </div>
       );
