@@ -442,6 +442,15 @@
       box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
+    .error-message {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     .portion-selector {
       display: flex;
       gap: 8px;
@@ -499,8 +508,13 @@
       color: white;
     }
 
-    .btn-primary:active {
+    .btn-primary:active:not(:disabled) {
       transform: scale(0.95);
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
     }
 
     .btn-secondary {
@@ -523,33 +537,6 @@
       border-top: 1px solid #ddd;
     }
 
-    /* DESKTOP - Scale up a bit */
-    @media (min-width: 768px) {
-      .container {
-        max-width: 600px;
-        padding: 20px;
-      }
-
-      .progress-grid {
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .quick-buttons {
-        grid-template-columns: 1fr 1fr 1fr;
-      }
-
-      .modal {
-        width: 90%;
-        max-width: 500px;
-        margin: 0 auto;
-        border-radius: 12px;
-      }
-
-      .modal-overlay {
-        align-items: center;
-      }
-    }
-
     /* UTILITY */
     .hidden {
       display: none;
@@ -569,6 +556,11 @@
   <script type="text/babel">
     // RESTAURANT & MEAL DATA
     const RESTAURANTS = {
+      'Home Cooked / Publix': {
+        meals: [
+          { name: 'Enter custom meal details below', custom: true }
+        ]
+      },
       'Chick-fil-A': {
         meals: [
           { name: 'Spicy Chicken Combo', calories: 460, protein: 28, carbs: 41, fat: 19 },
@@ -689,30 +681,26 @@
 
       const allMeals = [];
       Object.entries(RESTAURANTS).forEach(([restaurant, data]) => {
-        data.meals.forEach(meal => {
-          allMeals.push({ restaurant, ...meal });
-        });
+        if (restaurant !== 'Home Cooked / Publix') {
+          data.meals.forEach(meal => {
+            if (!meal.custom) {
+              allMeals.push({ restaurant, ...meal });
+            }
+          });
+        }
       });
 
-      // Score meals based on remaining needs
       const scored = allMeals.map(meal => {
         let score = 0;
-
-        // Prioritize protein if needed
         if (remaining.protein > 30) {
           score += meal.protein * 2;
         } else if (remaining.protein > 0) {
           score += meal.protein;
         }
-
-        // Don't exceed calories
         if (meal.calories > remaining.calories) {
           score -= 1000;
         }
-
-        // Prefer balanced macros
         if (meal.protein >= 25 && meal.fat <= 30) score += 50;
-
         return { ...meal, score };
       });
 
@@ -738,7 +726,6 @@
     function App() {
       const today = new Date().toISOString().split('T')[0];
 
-      // Load from localStorage
       const [meals, setMeals] = React.useState(() => {
         const stored = localStorage.getItem(`meals-${today}`);
         return stored ? JSON.parse(stored) : [];
@@ -763,7 +750,15 @@
       const [portion, setPortion] = React.useState('standard');
       const [notes, setNotes] = React.useState('');
 
-      // Save to localStorage
+      // Custom meal fields
+      const [customMealName, setCustomMealName] = React.useState('');
+      const [customCalories, setCustomCalories] = React.useState('');
+      const [customProtein, setCustomProtein] = React.useState('');
+      const [customCarbs, setCustomCarbs] = React.useState('');
+      const [customFat, setCustomFat] = React.useState('');
+
+      const [formError, setFormError] = React.useState('');
+
       React.useEffect(() => {
         localStorage.setItem(`meals-${today}`, JSON.stringify(meals));
       }, [meals, today]);
@@ -772,41 +767,86 @@
         localStorage.setItem(`metrics-${today}`, JSON.stringify(metrics));
       }, [metrics, today]);
 
+      const isCustomMeal = selectedRestaurant === 'Home Cooked / Publix';
       const totals = calculateTotals(meals);
       const recommendations = generateRecommendations(meals, metrics.bikeCompleted);
 
       const handleAddMeal = () => {
-        if (!selectedRestaurant || !selectedMeal) return;
+        setFormError('');
 
-        const restaurant = RESTAURANTS[selectedRestaurant];
-        const meal = restaurant.meals.find(m => m.name === selectedMeal);
+        if (isCustomMeal) {
+          // Custom meal validation
+          if (!customMealName.trim()) {
+            setFormError('Please enter a meal name');
+            return;
+          }
+          if (!customCalories || !customProtein || !customCarbs || !customFat) {
+            setFormError('Please fill in all nutrition fields');
+            return;
+          }
 
-        if (!meal) return;
+          const newMeal = {
+            id: Date.now(),
+            mealType,
+            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            restaurant: 'Home Cooked / Publix',
+            name: customMealName,
+            calories: parseInt(customCalories),
+            protein: parseInt(customProtein),
+            carbs: parseInt(customCarbs),
+            fat: parseInt(customFat),
+            notes
+          };
 
-        // Apply portion multiplier
-        const multiplier = portion === 'smaller' ? 0.75 : portion === 'larger' ? 1.25 : 1;
+          setMeals([...meals, newMeal]);
+          setShowMealModal(false);
+          setCustomMealName('');
+          setCustomCalories('');
+          setCustomProtein('');
+          setCustomCarbs('');
+          setCustomFat('');
+          setNotes('');
+        } else {
+          // Restaurant meal validation
+          if (!selectedRestaurant) {
+            setFormError('Please select a restaurant');
+            return;
+          }
+          if (!selectedMeal) {
+            setFormError('Please select a meal');
+            return;
+          }
 
-        const newMeal = {
-          id: Date.now(),
-          mealType,
-          time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
-          restaurant: selectedRestaurant,
-          name: selectedMeal,
-          calories: Math.round(meal.calories * multiplier),
-          protein: Math.round(meal.protein * multiplier),
-          carbs: Math.round(meal.carbs * multiplier),
-          fat: Math.round(meal.fat * multiplier),
-          notes
-        };
+          const restaurant = RESTAURANTS[selectedRestaurant];
+          const meal = restaurant.meals.find(m => m.name === selectedMeal);
 
-        setMeals([...meals, newMeal]);
+          if (!meal) {
+            setFormError('Meal not found');
+            return;
+          }
 
-        // Reset form
-        setShowMealModal(false);
-        setSelectedRestaurant('');
-        setSelectedMeal('');
-        setPortion('standard');
-        setNotes('');
+          const multiplier = portion === 'smaller' ? 0.75 : portion === 'larger' ? 1.25 : 1;
+
+          const newMeal = {
+            id: Date.now(),
+            mealType,
+            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+            restaurant: selectedRestaurant,
+            name: selectedMeal,
+            calories: Math.round(meal.calories * multiplier),
+            protein: Math.round(meal.protein * multiplier),
+            carbs: Math.round(meal.carbs * multiplier),
+            fat: Math.round(meal.fat * multiplier),
+            notes
+          };
+
+          setMeals([...meals, newMeal]);
+          setShowMealModal(false);
+          setSelectedRestaurant('');
+          setSelectedMeal('');
+          setPortion('standard');
+          setNotes('');
+        }
       };
 
       const handleDeleteMeal = (id) => {
@@ -866,12 +906,12 @@
 
             {/* QUICK LOG BUTTONS */}
             <div className="quick-buttons">
-              <button className="quick-btn" onClick={() => { setMealType('breakfast'); setShowMealModal(true); }}>🌅 Breakfast</button>
-              <button className="quick-btn" onClick={() => { setMealType('lunch'); setShowMealModal(true); }}>🥗 Lunch</button>
-              <button className="quick-btn" onClick={() => { setMealType('dinner'); setShowMealModal(true); }}>🍽️ Dinner</button>
-              <button className="quick-btn" onClick={() => { setMealType('snack'); setShowMealModal(true); }}>🍎 Snack</button>
-              <button className="quick-btn" onClick={() => { setMealType('bike'); setShowMealModal(true); }}>🚴 Post-Ride</button>
-              <button className="quick-btn" onClick={() => { setMealType('custom'); setShowMealModal(true); }}>➕ Custom</button>
+              <button className="quick-btn" onClick={() => { setMealType('breakfast'); setShowMealModal(true); setFormError(''); }}>🌅 Breakfast</button>
+              <button className="quick-btn" onClick={() => { setMealType('lunch'); setShowMealModal(true); setFormError(''); }}>🥗 Lunch</button>
+              <button className="quick-btn" onClick={() => { setMealType('dinner'); setShowMealModal(true); setFormError(''); }}>🍽️ Dinner</button>
+              <button className="quick-btn" onClick={() => { setMealType('snack'); setShowMealModal(true); setFormError(''); }}>🍎 Snack</button>
+              <button className="quick-btn" onClick={() => { setMealType('bike'); setShowMealModal(true); setFormError(''); }}>🚴 Post-Ride</button>
+              <button className="quick-btn" onClick={() => { setMealType('custom'); setSelectedRestaurant('Home Cooked / Publix'); setShowMealModal(true); setFormError(''); }}>🏠 Home Cooked</button>
             </div>
 
             {/* MEALS LIST */}
@@ -916,6 +956,7 @@
                         setSelectedMeal(rec.name);
                         setMealType('lunch');
                         setShowMealModal(true);
+                        setFormError('');
                       }}>Log</button>
                     </div>
                   ))}
@@ -968,29 +1009,30 @@
                   <button className="btn-close" onClick={() => setShowMealModal(false)}>✕</button>
                 </div>
 
-                {mealType !== 'custom' ? (
+                {!isCustomMeal ? (
                   <>
                     <div className="form-group">
                       <label>Restaurant</label>
-                      <select value={selectedRestaurant} onChange={(e) => { setSelectedRestaurant(e.target.value); setSelectedMeal(''); }}>
+                      <select value={selectedRestaurant} onChange={(e) => { setSelectedRestaurant(e.target.value); setSelectedMeal(''); setFormError(''); }}>
                         <option value="">Choose a restaurant...</option>
-                        {Object.keys(RESTAURANTS).map(r => <option key={r} value={r}>{r}</option>)}
+                        {Object.keys(RESTAURANTS).map(r => r !== 'Home Cooked / Publix' && <option key={r} value={r}>{r}</option>)}
+                        <option value="Home Cooked / Publix">Home Cooked / Publix</option>
                       </select>
                     </div>
 
-                    {selectedRestaurant && (
+                    {selectedRestaurant && selectedRestaurant !== 'Home Cooked / Publix' && (
                       <div className="form-group">
                         <label>Meal</label>
-                        <select value={selectedMeal} onChange={(e) => setSelectedMeal(e.target.value)}>
+                        <select value={selectedMeal} onChange={(e) => { setSelectedMeal(e.target.value); setFormError(''); }}>
                           <option value="">Choose a meal...</option>
-                          {RESTAURANTS[selectedRestaurant].meals.map(m => (
+                          {RESTAURANTS[selectedRestaurant]?.meals.map(m => (
                             <option key={m.name} value={m.name}>{m.name}</option>
                           ))}
                         </select>
                       </div>
                     )}
 
-                    {selectedMeal && (
+                    {selectedMeal && selectedRestaurant !== 'Home Cooked / Publix' && (
                       <>
                         <div className="form-group">
                           <label>Portion Size</label>
@@ -1016,23 +1058,65 @@
 
                     <div className="form-group">
                       <label>Notes (optional)</label>
-                      <input type="text" placeholder="e.g., no oil, extra protein..." value={notes} onChange={(e) => setNotes(e.target.value)} />
-                    </div>
-
-                    <div className="modal-buttons">
-                      <button className="btn-secondary" onClick={() => setShowMealModal(false)}>Cancel</button>
-                      <button className="btn-primary" onClick={handleAddMeal} disabled={!selectedRestaurant || !selectedMeal}>Save Meal</button>
+                      <input type="text" placeholder="e.g., no oil, extra protein..." value={notes} onChange={(e) => { setNotes(e.target.value); setFormError(''); }} />
                     </div>
                   </>
                 ) : (
-                  <div className="empty-state">Custom meal entry coming soon!</div>
+                  <>
+                    <div className="form-group">
+                      <label>Meal Name *</label>
+                      <input type="text" placeholder="e.g., Egg & Cheese Sandwich" value={customMealName} onChange={(e) => { setCustomMealName(e.target.value); setFormError(''); }} />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div className="form-group">
+                        <label>Calories *</label>
+                        <input type="number" placeholder="400" value={customCalories} onChange={(e) => { setCustomCalories(e.target.value); setFormError(''); }} />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Protein (g) *</label>
+                        <input type="number" placeholder="25" value={customProtein} onChange={(e) => { setCustomProtein(e.target.value); setFormError(''); }} />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Carbs (g) *</label>
+                        <input type="number" placeholder="40" value={customCarbs} onChange={(e) => { setCustomCarbs(e.target.value); setFormError(''); }} />
+                      </div>
+
+                      <div className="form-group">
+                        <label>Fat (g) *</label>
+                        <input type="number" placeholder="15" value={customFat} onChange={(e) => { setCustomFat(e.target.value); setFormError(''); }} />
+                      </div>
+                    </div>
+
+                    <div className="form-group">
+                      <label>Notes (optional)</label>
+                      <input type="text" placeholder="e.g., From Publix, homemade..." value={notes} onChange={(e) => { setNotes(e.target.value); setFormError(''); }} />
+                    </div>
+
+                    <div className="nutrition-preview">
+                      {customCalories || 0} cal | {customProtein || 0}g protein | {customCarbs || 0}g carbs | {customFat || 0}g fat
+                    </div>
+                  </>
                 )}
+
+                {formError && (
+                  <div className="error-message">
+                    ⚠️ {formError}
+                  </div>
+                )}
+
+                <div className="modal-buttons">
+                  <button className="btn-secondary" onClick={() => setShowMealModal(false)}>Cancel</button>
+                  <button className="btn-primary" onClick={handleAddMeal}>Save Meal</button>
+                </div>
               </div>
             </div>
           )}
 
           <footer className="footer">
-            <p>Phase 2 Live ✓ | Mobile-First | Real-Time Tracking | Local Storage Active</p>
+            <p>Phase 2 Live ✓ | Mobile-First | Real-Time Tracking | Custom Meals Support</p>
           </footer>
         </div>
       );
